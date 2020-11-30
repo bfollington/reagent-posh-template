@@ -1,0 +1,15 @@
+{
+  "calva.replConnectSequences": [
+    {
+        "name": "Devcards - 7guis",
+        "projectType": "Leiningen",
+        "cljsType": "Figwheel Main",
+        "menuSelections": {
+            "cljsLaunchBuilds": [
+                "devcards",
+            ],
+            "cljsDefaultBuild": "devcards"
+        }
+    }
+  ]
+}
