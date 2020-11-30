@@ -59,13 +59,24 @@
 (defn is-one-way-flight? [state]
   (= (:type state) "one-way"))
 
+(defn get-dates [state]
+  {:depart (->> state :depart-date :value (parse date-format))
+   :return (->> state :return-date :value (parse date-format))})
+
 (defn return-before-depart? [state]
   (if (and (-> state :depart-date :valid)
            (-> state :return-date :valid))
-    (let [depart (->> state :depart-date :value (parse date-format))
-          return (->> state :return-date :value (parse date-format))]
+    (let [{:keys [depart return]} (get-dates state)]
       (time/before? return depart))
     false))
+
+(defn show-popup! [state]
+  (let [depart (->> state :depart-date :value)
+        return (->> state :return-date :value)]
+    (js/alert
+     (case (:type state)
+       "one-way" (str "You have booked a one-way flight on " depart)
+       "return" (str "You have booked a return flight, departing on " depart " and returning on " return)))))
 
 (defn flight-booker []
   (let [state (atom {:type "one-way"
@@ -86,4 +97,4 @@
                    :disabled (or (-> @state :depart-date :valid not)
                                  (return-before-depart? @state)
                                  (is-one-way-flight? @state)))
-                  [:button "Book"]]])))
+                  [:button {:on-click #(show-popup! @state)} "Book"]]])))
