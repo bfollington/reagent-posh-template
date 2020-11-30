@@ -31,7 +31,7 @@
                (catch :default _
                  :invalid))
         valid (if (not (= date :invalid))
-                (time/after? date (time/today-at-midnight)) ;; dates must be in the future
+                (time/after? date (yesterday-at-midnight)) ;; dates must be in the future
                 false)]
     {:value date-str :valid valid}))
 
