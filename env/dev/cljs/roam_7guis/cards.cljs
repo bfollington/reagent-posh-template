@@ -3,6 +3,7 @@
             [reagent.dom :as rdom]
             [roam-7guis.core :as core]
             [devcards.core :as dc]
+            [roam-7guis.counter :as counter]
             [roam-7guis.tempconv :as temp]
             [roam-7guis.flight-booker :as flight]
             [roam-7guis.timer :as timer]
@@ -13,12 +14,7 @@
     :refer [defcard defcard-doc defcard-rg deftest]]))
 
 (defcard-rg counter
-  (let [clicks (atom 0)
-        on-clicked #(swap! clicks inc)]
-    (fn []
-      [:div
-       [:label @clicks]
-       [:button {:on-click on-clicked} "Count"]])))
+  (counter/counter))
 
 (defcard-rg temp-conv
   (temp/temp-conv))

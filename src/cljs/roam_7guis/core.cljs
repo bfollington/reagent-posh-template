@@ -5,7 +5,12 @@
    [reagent.session :as session]
    [reitit.frontend :as reitit]
    [clerk.core :as clerk]
-   [accountant.core :as accountant]))
+   [accountant.core :as accountant]
+   [roam-7guis.counter :as counter]
+   [roam-7guis.tempconv :as temp]
+   [roam-7guis.flight-booker :as flight]
+   [roam-7guis.timer :as timer]
+   [roam-7guis.crud :as crud]))
 
 ;; -------------------------
 ;; Routes
@@ -30,9 +35,11 @@
   (fn []
     [:span.main
      [:h1 "Welcome to roam-7guis"]
-     [:ul
-      [:li [:a {:href (path-for :items)} "Items of roam-7guis"]]
-      [:li [:a {:href "/broken/link"} "Broken link"]]]]))
+     [:div [counter/counter]]
+     [:div [temp/temp-conv]]
+     [:div [flight/flight-booker]]
+     [:div [timer/timer]]
+     [:div [crud/crud]]]))
 
 
 
@@ -103,8 +110,7 @@
         (reagent/after-render clerk/after-render!)
         (session/put! :route {:current-page (page-for current-page)
                               :route-params route-params})
-        (clerk/navigate-page! path)
-        ))
+        (clerk/navigate-page! path)))
     :path-exists?
     (fn [path]
       (boolean (reitit/match-by-path router path)))})
