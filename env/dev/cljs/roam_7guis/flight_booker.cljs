@@ -22,15 +22,6 @@
 
 ;;
 
-(defn set-flight-type! [state type]
-  (set-state! state :type type))
-
-(defn flight-type [value state]
-  [:select {:value value
-            :on-change (fn [e] (let [value (-> e .-target .-value)] (set-flight-type! state value)))}
-   [:option {:value :one-way} "one-way flight"]
-   [:option {:value :return} "return flight"]])
-
 (defn yesterday-at-midnight []
   (time/plus (time/today-at-midnight) (time/days -1)))
 
@@ -44,17 +35,6 @@
                 false)]
     {:value date-str :valid valid}))
 
-(defn date-entry [field key state & {:keys [disabled] :or {disabled false}}]
-  [:input {:value (:value field)
-           :style {:background
-                   (cond
-                     (:valid field) "white"
-                     disabled "#eee"
-                     (not (:valid field)) "#FF9999")}
-           :disabled disabled
-           :on-change (fn [e]
-                        (let [value (-> e .-target .-value)]
-                          (set-state! state key (validate-date value))))}])
 
 (defn is-one-way-flight? [state]
   (= (:type state) "one-way"))
@@ -70,6 +50,10 @@
       (time/before? return depart))
     false))
 
+
+(defn set-flight-type! [state type]
+  (set-state! state :type type))
+
 (defn show-popup! [state]
   (let [depart (->> state :depart-date :value)
         return (->> state :return-date :value)]
@@ -77,6 +61,28 @@
      (case (:type state)
        "one-way" (str "You have booked a one-way flight on " depart)
        "return" (str "You have booked a return flight, departing on " depart " and returning on " return)))))
+
+;;
+
+(defn flight-type [value state]
+  [:select {:value value
+            :on-change (fn [e]
+                         (let [value (-> e .-target .-value)]
+                           (set-flight-type! state value)))}
+   [:option {:value :one-way} "one-way flight"]
+   [:option {:value :return} "return flight"]])
+
+(defn date-entry [field key state & {:keys [disabled] :or {disabled false}}]
+  [:input {:value (:value field)
+           :style {:background
+                   (cond
+                     (:valid field) "white"
+                     disabled "#eee"
+                     (not (:valid field)) "#FF9999")}
+           :disabled disabled
+           :on-change (fn [e]
+                        (let [value (-> e .-target .-value)]
+                          (set-state! state key (validate-date value))))}])
 
 (defn flight-booker []
   (let [state (atom {:type "one-way"
