@@ -35,11 +35,25 @@
   (fn []
     [:span.main
      [:h1 "Welcome to roam-7guis"]
+     [:hr]
+     [:h2 "1: counter"]
      [:div [counter/counter]]
+     [:hr]
+     [:h2 "2: temperature converter"]
      [:div [temp/temp-conv]]
+     [:hr]
+     [:h2 "3: flight booker"]
      [:div [flight/flight-booker]]
+     [:hr]
+     [:h2 "4: timer"]
      [:div [timer/timer]]
-     [:div [crud/crud]]]))
+     [:hr]
+     [:h2 "5: crud"]
+     [:div [crud/crud]]
+     [:hr]
+     [:h2 "6: circles"]
+     [:hr]
+     [:h2 "7: spreadsheet"]]))
 
 
 
