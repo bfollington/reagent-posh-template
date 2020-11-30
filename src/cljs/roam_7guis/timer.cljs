@@ -1,8 +1,6 @@
 (ns roam-7guis.timer
   (:require [reagent.core :as reagent :refer [atom]]
             [clojure.pprint :as pp]
-            [cljs-time.core :as time]
-            [cljs-time.format :refer [parse unparse formatter]]
             [re-com.core :refer [h-box v-box]]))
 
 (defn log [& args]

@@ -1,12 +1,5 @@
 (ns roam-7guis.counter
-  (:require [reagent.core :as reagent :refer [atom]]
-            [reagent.dom :as rdom]
-            [roam-7guis.core :as core]
-            [devcards.core :as dc])
-  (:require-macros
-   [devcards.core
-    :as dc
-    :refer [defcard defcard-doc defcard-rg deftest]]))
+  (:require [reagent.core :as reagent :refer [atom]]))
 
 (defn counter []
   (let [clicks (atom 0)
