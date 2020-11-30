@@ -8,7 +8,8 @@
             [roam-7guis.flight-booker :as flight]
             [roam-7guis.timer :as timer]
             [roam-7guis.crud :as crud]
-            [roam-7guis.circles :as circles])
+            [roam-7guis.circles :as circles]
+            [roam-7guis.spreadsheet :as spreadsheet])
   (:require-macros
    [devcards.core
     :as dc
@@ -31,6 +32,9 @@
 
 (defcard-rg circles
   (circles/circles))
+
+(defcard-rg spreadsheet
+  (spreadsheet/spreadsheet))
 
 (rdom/render [:div] (.getElementById js/document "app"))
 

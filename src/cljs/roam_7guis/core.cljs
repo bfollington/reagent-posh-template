@@ -11,7 +11,8 @@
    [roam-7guis.flight-booker :as flight]
    [roam-7guis.timer :as timer]
    [roam-7guis.crud :as crud]
-   [roam-7guis.circles :as circles]))
+   [roam-7guis.circles :as circles]
+   [roam-7guis.spreadsheet :as spreadsheet]))
 
 ;; -------------------------
 ;; Routes
@@ -55,7 +56,8 @@
      [:h2 "6: circles"]
      [:div [circles/circles]]
      [:hr]
-     [:h2 "7: spreadsheet"]]))
+     [:h2 "7: spreadsheet"]
+     [:div [spreadsheet/spreadsheet]]]))
 
 
 
