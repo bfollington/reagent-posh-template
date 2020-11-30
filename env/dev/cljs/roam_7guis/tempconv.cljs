@@ -42,7 +42,7 @@
                                      :c v
                                      :f (to-celcius v))))
 
-        ;; might benefit from some re-frame msg oriented modelling here...
+        ;; TODO(ben): this is gross af
         mk-on-change (fn [input-field-state units]
                        (fn [e]
                          (let [result (validate! (value e) input-field-state)]

@@ -94,13 +94,13 @@
       [v-box
        :width "256px"
        :children [[:p "Flights can only be booked in the future"]
-                  (flight-type (:type @state) state)
-                  (date-entry (-> @state :depart-date) :depart-date state)
-                  (date-entry
+                  [flight-type (:type @state) state]
+                  [date-entry (-> @state :depart-date) :depart-date state]
+                  [date-entry
                    (-> @state :return-date)
                    :return-date
                    state
                    :disabled (or (-> @state :depart-date :valid not)
                                  (return-before-depart? @state)
-                                 (is-one-way-flight? @state)))
+                                 (is-one-way-flight? @state))]
                   [:button {:on-click #(show-popup! @state)} "Book"]]])))
