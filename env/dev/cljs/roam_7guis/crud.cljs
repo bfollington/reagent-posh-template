@@ -20,6 +20,8 @@
            "1" ["Conor" "White-Sullivan"]
            "2" ["Michael" "Ashcroft"]}
    :filter ""
+   :edit-form {:first ""
+               :last ""}
    :selected-id "-1"})
 
 (defn format-name [[first last]]
@@ -32,29 +34,44 @@
        (filter (fn [[_ [_ last]]]
                  (string/starts-with? last filter-text)))))
 
+(defn set-selected-entry! [state value]
+  (set-state! state :selected-id value)
+  (let [[first last] (get (:names @state) value)]
+    (set-state! state :edit-form {:first first
+                                  :last last})))
+
 (defn name-list [state]
   [:select {:size 4
             :on-change (fn [e]
                          (let [value (-> e .-target .-value)]
-                           (set-state! state :selected-id value)))}
+                           (set-selected-entry! state value)))}
    (let [names (select-names state (:filter @state))]
      (map (fn [[i v]] [:option {:key i
                                 :value i} (format-name v)]) names))])
 
+(defn raw-input [state path]
+  [:input {:type "text"
+           :value (get-in @state path)
+           :on-change (fn [e]
+                        (let [value (-> e .-target .-value)]
+                          (swap! state #(assoc-in % path value))))}])
+
 (defn edit-form [state selected-index]
-  (let [selected (get (:names @state) selected-index)]
-    (if (some? selected)
-      (let [[first last] selected]
-        [v-box
-         :children [[:input {:type "text" :value first}]
-                    [:input {:type "text" :value last}]]])
-      [:div "does not have a value" selected-index])))
+  [v-box
+   :children [[raw-input state [:edit-form :first]]
+              [raw-input state [:edit-form :last]]]])
 
 (defn filter-field [state]
   [:input {:type "text"
            :value (:filter @state)
            :on-change (fn [e] (let [value (-> e .-target .-value)]
                                 (set-state! state :filter value)))}])
+
+(defn action-buttons [state]
+  [h-box
+   :children [[:button "Create"]
+              [:button "Update"]
+              [:button "Delete"]]])
 
 (defn crud []
   (let [state (atom initial-state)]
@@ -65,4 +82,4 @@
                   [h-box
                    :children [[name-list state]
                               [edit-form state (:selected-id @state)]]]
-                  [:div "buttons"]]])))
+                  [action-buttons state]]])))
