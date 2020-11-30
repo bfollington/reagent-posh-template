@@ -14,6 +14,7 @@
                  [yogthos/config "1.1.7"]
                  [re-com "2.9.0"]
                  [com.andrewmcveigh/cljs-time "0.5.2"]
+                 [herb "0.10.0"]
                  [org.clojure/clojurescript "1.10.773"
                   :scope "provided"]
                  [metosin/reitit "0.5.1"]
