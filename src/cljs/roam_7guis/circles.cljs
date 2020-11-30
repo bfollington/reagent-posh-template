@@ -18,7 +18,8 @@
 (defn circle-data [[x y] r]
   {:x x :y y :r r})
 
-(def initial-state {:snapshots [[(circle-data [0 0] 32)]]}) ;; a list of circles
+(def initial-state {:snapshots [[(circle-data [0 0] 32)]]
+                    :cursor 0})
 
 ;;
 
@@ -41,10 +42,15 @@
     :class (<class circle-style x y r)}])
 
 (defn select-current [state]
-  (-> @state :snapshots last))
+  (-> @state :snapshots (get (:cursor @state))))
 
 (defn add-snapshot! [state circles]
-  (swap! state (fn [s] (update s :snapshots #(conj % circles)))))
+  (let [history (subvec (:snapshots @state) 0 (inc (:cursor @state)))
+        history' (conj history circles)]
+    (log history history')
+    (swap! state (fn [s] (-> s
+                             (assoc :snapshots history')
+                             (update :cursor inc))))))
 
 (def default-radius 16)
 
@@ -61,12 +67,21 @@
         y (- (.-clientY e) (.-top rect) default-radius)]
     (add-circle! state x y)))
 
+(defn undo! [state]
+  (swap! state #(update-in % [:cursor] dec)))
+
+(defn redo! [state]
+  (swap! state #(update-in % [:cursor] inc)))
+
 (defn circles []
   (let [state (atom initial-state)]
     (fn []
-      [:div {:style {:position "relative"
-                     :width "420px"
-                     :height "420px"}
-             :on-click (partial on-add-circle! state)}
+      [:div
+       [:button {:on-click #(undo! state)} "Undo"]
+       [:button {:on-click #(redo! state)} "Redo"]
+       [:div {:style {:position "relative"
+                      :width "420px"
+                      :height "420px"}
+              :on-click (partial on-add-circle! state)}
       ;;  (str (select-current state))
-       (map circle (select-current state))])))
+        (map circle (select-current state))]])))
