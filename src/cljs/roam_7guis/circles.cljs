@@ -18,11 +18,35 @@
 (defn circle-data [[x y] r]
   {:x x :y y :r r})
 
-(def initial-state {:snapshots [[(circle-data [0 0] 32)]]
-                    :cursor 0})
+(def initial-state {:actions [[:add-circle 0 [128 128 16]]
+                              [:add-circle 1 [92 62 16]]
+                              [:set-diameter 0 32]]
+                    :last-id 1
+                    :cursor 2})
 
+(defn generate-id! [state]
+  (swap! state #(update % :last-id inc))
+  (:last-id @state))
+
+(defn calculate-circles [actions]
+  (into [] (reduce (fn [circles [cmd id param]]
+                     (case cmd
+                       :add-circle (assoc circles id param)
+                       :set-diameter (update circles id (fn [[x y _]] [x y param]))))
+                   {} actions)))
+
+(defn select-current [state]
+  (-> @state :actions (subvec 0 (inc (:cursor @state)))))
+
+(defn add-action! [state action]
+  (let [history (subvec (:actions @state) 0 (inc (:cursor @state)))
+        history' (conj history action)]
+    (swap! state (fn [s] (-> s
+                             (assoc :actions history')
+                             (update :cursor inc))))))
 ;;
 
+(def default-radius 16)
 (defn px [v] (str v "px"))
 
 (defn circle-style [x y r]
@@ -34,54 +58,57 @@
    :width (str (* 2 r) "px")
    :height (str (* 2 r) "px")
    :border-radius "9999px"
+   :transform "translate(-50%, -50%)"
    :border "1px solid black"})
 
-(defn circle [{:keys [x y r]}]
+(defn set-circle-diameter! [state id d]
+  (add-action! state [:set-diameter id d]))
+
+(defn on-click-circle [id state e]
+  (.stopPropagation e)
+  (set-circle-diameter! state id 32))
+
+(defn circle [state [id [x y r]]]
+  ^{:key (str x y r)}
   [:div
-   {:key (str x y r)
-    :class (<class circle-style x y r)}])
-
-(defn select-current [state]
-  (-> @state :snapshots (get (:cursor @state))))
-
-(defn add-snapshot! [state circles]
-  (let [history (subvec (:snapshots @state) 0 (inc (:cursor @state)))
-        history' (conj history circles)]
-    (log history history')
-    (swap! state (fn [s] (-> s
-                             (assoc :snapshots history')
-                             (update :cursor inc))))))
-
-(def default-radius 16)
+   {:class (<class circle-style x y r)
+    :on-click (partial on-click-circle id state)}])
 
 (defn add-circle! [state x y]
-  (let [current (select-current state)
-        circle (circle-data [x y] default-radius)
-        circles (conj current circle)]
-    (log [current x y])
-    (add-snapshot! state circles)))
+  (add-action! state [:add-circle (generate-id! state) [x y default-radius]]))
 
 (defn on-add-circle! [state e]
   (let [rect (-> e .-target .getBoundingClientRect)
-        x (- (.-clientX e) (.-left rect) default-radius)
-        y (- (.-clientY e) (.-top rect) default-radius)]
+        x (- (.-clientX e) (.-left rect))
+        y (- (.-clientY e) (.-top rect))]
     (add-circle! state x y)))
 
+(defn constrain [min max value]
+  (Math/max min (Math/min max value)))
+
+(defn count-entries [state]
+  (count (:actions @state)))
+
 (defn undo! [state]
-  (swap! state #(update-in % [:cursor] dec)))
+  (let [dec-cursor (comp (partial constrain 0 (count-entries state)) dec)]
+    (swap! state #(update-in % [:cursor] dec-cursor))))
 
 (defn redo! [state]
-  (swap! state #(update-in % [:cursor] inc)))
+  (let [inc-cursor (comp (partial constrain 0 (dec (count-entries state))) inc)]
+    (swap! state #(update-in % [:cursor] inc-cursor))))
+
+(defn gen-key [[id _]]
+  (str id))
 
 (defn circles []
   (let [state (atom initial-state)]
     (fn []
       [:div
+      ;;  (str (:cursor @state) (select-current state))
        [:button {:on-click #(undo! state)} "Undo"]
        [:button {:on-click #(redo! state)} "Redo"]
        [:div {:style {:position "relative"
                       :width "420px"
                       :height "420px"}
               :on-click (partial on-add-circle! state)}
-      ;;  (str (select-current state))
-        (map circle (select-current state))]])))
+        (map (fn [v] ^{:key (gen-key v)} [circle state v]) (-> state select-current calculate-circles))]])))
