@@ -4,14 +4,13 @@
             [roam-7guis.core :as core]
             [devcards.core :as dc]
             [roam-7guis.tempconv :as temp]
-            [roam-7guis.flight-booker :as flight])
+            [roam-7guis.flight-booker :as flight]
+            [roam-7guis.timer :as timer]
+            [roam-7guis.crud :as crud])
   (:require-macros
    [devcards.core
     :as dc
     :refer [defcard defcard-doc defcard-rg deftest]]))
-
-(defcard-rg first-card
-  [:div>h1 "This is your first devcard!"])
 
 (defcard-rg counter
   (let [clicks (atom 0)
@@ -27,8 +26,11 @@
 (defcard-rg flight-booker
   (flight/flight-booker))
 
-(defcard-rg home-page-card
-  [core/home-page])
+(defcard-rg timer
+  (timer/timer))
+
+(defcard-rg crud
+  (crud/crud))
 
 (rdom/render [:div] (.getElementById js/document "app"))
 
