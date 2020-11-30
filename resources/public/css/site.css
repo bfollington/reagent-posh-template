@@ -32,3 +32,8 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
+/* required for re-com v-box, h-box etc. */
+.display-flex {
+  display: flex;
+}
