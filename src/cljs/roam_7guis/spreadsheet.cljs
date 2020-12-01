@@ -16,9 +16,9 @@
 
 ;;
 
-(defn initial-state [] {:cells [[(atom {:content [:value "1"] :cache "1"}) (atom {:content [:value "2"] :cache "2"}) (atom {:content [:value "0"] :cache "0"})]
-                                [(atom {:content [:formula "[:add [[:add [\"A0\" \"B0\"]] \"B1\"]]"] :cache "7"}) (atom {:content [:value "4"] :cache "4"}) (atom {:content [:value "0"] :cache "0"})]
-                                [(atom {:content [:value "0"] :cache "0"}) (atom {:content [:value "0"] :cache "0"}) (atom {:content [:value "0"] :cache "0"})]]
+(defn initial-state [] {:cells [[(atom {:content [:value "0"] :cache "0" :depends-on []}) (atom {:content [:value "0"] :cache "0" :depends-on []}) (atom {:content [:value "0"] :cache "0" :depends-on []})]
+                                [(atom {:content [:value "0"] :cache "0" :depends-on []}) (atom {:content [:value "0"] :cache ""  :depends-on []}) (atom {:content [:value "0"] :cache "0" :depends-on []})]
+                                [(atom {:content [:value "0"] :cache "0" :depends-on []}) (atom {:content [:value "0"] :cache "0" :depends-on []}) (atom {:content [:value "0"] :cache "0" :depends-on []})]]
                         :references [[(atom []) (atom [])]
                                      [(atom []) (atom [])]]})
 (def alpha "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -44,6 +44,9 @@
 (defn get-cell-cache-id [matrix id]
   (:cache @(get-cell-id matrix id)))
 
+(defn get-cell-deps-id [matrix id]
+  (:depends-on @(get-cell-id matrix id)))
+
 (defn render-cell-id [matrix id]
   (log ["rendering" id])
   (let [[type contents] (get-cell-content-id matrix id)]
@@ -56,15 +59,42 @@
     (= (first formula) "=") [:formula (subs formula 1)]
     :else [:value formula]))
 
-(defn update-cell-id! [matrix id value]
-  (log ["updating" id (id->coords id) value])
-  (let [update-content! (fn [cell] (swap! cell #(assoc % :content (parse-formula value))))
-        update-cache! (fn [cell] (swap! cell #(assoc % :cache (render-cell-id matrix id))))]
-    (update-in matrix (reverse (id->coords id)) update-content!)
+(defn recalc-cell-id! [matrix id]
+  (let [update-cache! (fn [cell] (swap! cell #(assoc % :cache (render-cell-id matrix id))))]
     (update-in matrix (reverse (id->coords id)) update-cache!)))
 
-(defn watch-cell [matrix target-id watcher-id watcher]
-  (add-watch (get-cell matrix (id->coords target-id)) watcher-id watcher))
+(defn watch-cell [matrix target-id watcher-id]
+  (log ["started watching" target-id "from" watcher-id])
+  (add-watch
+   (get-cell matrix (id->coords target-id))
+   watcher-id
+   (fn [_ _ _ _]
+     (log ["change in" target-id "updating" watcher-id])
+     (recalc-cell-id! matrix watcher-id))))
+
+
+(defn update-cell-id! [matrix id value]
+  (log ["updating" id (id->coords id) value])
+  (let [formula (parse-formula value)
+        update-content! (fn [cell] (swap! cell #(assoc % :content formula)))
+        update-cache! (fn [cell] (swap! cell #(assoc % :cache (render-cell-id matrix id))))
+        [formula-type body] formula
+        deps (if (= formula-type :formula) (parser/evaluate-deps body) [])
+        old-deps (get-cell-deps-id matrix id)
+        new-deps deps
+        update-deps! (fn [cell] (swap! cell #(assoc % :depends-on deps)))]
+    (update-in matrix (reverse (id->coords id)) update-content!)
+    (update-in matrix (reverse (id->coords id)) update-cache!)
+
+    (doseq [d old-deps]
+      (remove-watch (get-cell-id matrix d) id))
+
+    (doseq [d new-deps]
+      (log ["hello" d])
+      (watch-cell matrix d id))
+
+    (update-in matrix (reverse (id->coords id)) update-deps!)))
+
 
 ;;
 
@@ -82,7 +112,9 @@
       [:div
        [:input {:type "text" :value @form :on-change #(reset! form (-> % .-target .-value))}]
        [:button {:on-click (fn [_] (update-cell-id! (:cells state) id @form))} "Save"]
-       [:div  "=" (str (render-cell-id (:cells state) id))]])))
+       [:div  "=" (str (render-cell-id (:cells state) id))]
+      ;;  [:div (str (:depends-on @contents))]
+       ])))
 
 (defn border-style []
   {:border "1px solid #ccc"})
