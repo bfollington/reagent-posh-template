@@ -93,6 +93,7 @@
     (fn []
       [v-box
        :width "256px"
+       :gap "4px"
        :children [[:p "Flights can only be booked in the future"]
                   [flight-type (:type @state) state]
                   [date-entry (-> @state :depart-date) :depart-date state]

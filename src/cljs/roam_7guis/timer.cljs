@@ -20,11 +20,14 @@
 
 (defn progress-bar [value max]
   [h-box
+   :gap "8px"
+   :align :center
    :children [[:label "Elapsed time"]
-              [:progress {:value value :max max}]]])
+              [:progress {:style {:width "128px"} :value value :max max}]]])
 
 (defn duration-slider [state]
   [h-box
+   :gap "8px"
    :children [[:label "Duration"]
               [:input {:type "range"
                        :value (:duration @state)
@@ -39,13 +42,14 @@
                      :current 5})]
     (fn []
       (js/setTimeout
-       (fn [e]
+       (fn [_]
          (when (< (:current @state) (:duration @state))
            (swap! state #(update % :current (partial + 0.01)))))
        10)
 
       [v-box
        :width "256px"
+       :gap "4px"
        :children [[progress-bar (-> @state :current) (-> @state :duration)]
                   [:label (str (-> @state :current (.toFixed 2)) "s")]
                   [duration-slider state]

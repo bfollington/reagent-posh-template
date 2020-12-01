@@ -1,10 +1,11 @@
 (ns roam-7guis.tempconv
-  (:require [reagent.core :as reagent :refer [atom]]))
+  (:require [reagent.core :as reagent :refer [atom]]
+            [re-com.core :refer [h-box box gap v-box hyperlink-href p]]))
 
-(defn to-fahrenheit [c]
+(defn c->f [c]
   (+ (* c (/ 9 5)) 32))
 
-(defn to-celcius [f]
+(defn f->c [f]
   (* (/ 5 9) (- f 32)))
 
 (defn value [e]
@@ -21,19 +22,19 @@
     out))
 
 (defn temp-style [valid]
-  {:background (if valid "white" "red")})
+  {:background (if valid "white" "#FF9999")})
 
 (defn temp-conv []
   (let [temp-internal (atom 5)
 
         input-c (atom {:value @temp-internal :valid true})
-        input-f (atom {:value (to-fahrenheit @temp-internal) :valid true})
+        input-f (atom {:value (c->f @temp-internal) :valid true})
 
         update-internal! (fn [v units]
                            (reset! temp-internal
                                    (case units
                                      :c v
-                                     :f (to-celcius v))))
+                                     :f (f->c v))))
 
         ;; TODO(ben): this is gross af
         mk-on-change (fn [input-field-state units]
@@ -47,7 +48,7 @@
                             #(assoc % :value
                                     (case units
                                       :c (Math/round n)
-                                      :f (-> n to-fahrenheit Math/round))))))
+                                      :f (-> n c->f Math/round))))))
 
         on-change-c (mk-on-change input-c :c)
         on-change-f (mk-on-change input-f :f)]
@@ -56,14 +57,16 @@
     (add-watch temp-internal :f (mk-watch input-f :f))
 
     (fn []
-      [:div
-       [:input {:type "number"
-                :style (temp-style (:valid @input-c))
-                :value (:value @input-c)
-                :on-change on-change-c}]
-       [:label "Celcius"]
-       [:input {:type "number"
-                :style (temp-style (:valid @input-f))
-                :value (:value @input-f)
-                :on-change on-change-f}]
-       [:label "Fahrenheit"]])))
+      [h-box
+       :gap "8px"
+       :children [[:input {:type "number"
+                           :style (temp-style (:valid @input-c))
+                           :value (:value @input-c)
+                           :on-change on-change-c}]
+                  [:label "Celcius"]
+                  [:label "="]
+                  [:input {:type "number"
+                           :style (temp-style (:valid @input-f))
+                           :value (:value @input-f)
+                           :on-change on-change-f}]
+                  [:label "Fahrenheit"]]])))

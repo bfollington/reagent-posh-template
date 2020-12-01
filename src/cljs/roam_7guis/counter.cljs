@@ -1,10 +1,12 @@
 (ns roam-7guis.counter
-  (:require [reagent.core :as reagent :refer [atom]]))
+  (:require [reagent.core :as reagent :refer [atom]]
+            [re-com.core :refer [h-box box gap v-box hyperlink-href p]]))
 
 (defn counter []
   (let [clicks (atom 0)
         on-clicked #(swap! clicks inc)]
     (fn []
-      [:div
-       [:label @clicks]
-       [:button {:on-click on-clicked} "Count"]])))
+      [h-box
+       :gap "8px"
+       :children [[:label @clicks]
+                  [:button {:on-click on-clicked} "Count"]]])))

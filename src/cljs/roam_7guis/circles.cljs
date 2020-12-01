@@ -15,28 +15,19 @@
 
 ;;
 
-(defn circle-data [[x y] r]
-  {:x x :y y :r r})
+(def default-radius 16)
+(defn px [v] (str v "px"))
 
-(def initial-state {:actions [[:add-circle 0 [128 128 16]]
-                              [:add-circle 1 [92 62 16]]
-                              [:set-diameter 0 32]]
+(defn constrain [min max value]
+  (Math/max min (Math/min max value)))
+
+(def initial-state {:actions [[:init 0 []]]
                     :last-id 1
-                    :cursor 2})
+                    :cursor 0})
 
 (defn generate-id! [state]
   (swap! state #(update % :last-id inc))
   (:last-id @state))
-
-(defn calculate-circles [actions]
-  (into [] (reduce (fn [circles [cmd id param]]
-                     (case cmd
-                       :add-circle (assoc circles id param)
-                       :set-diameter (update circles id (fn [[x y _]] [x y param]))))
-                   {} actions)))
-
-(defn select-current [state]
-  (-> @state :actions (subvec 0 (inc (:cursor @state)))))
 
 (defn add-action! [state action]
   (let [history (subvec (:actions @state) 0 (inc (:cursor @state)))
@@ -44,10 +35,32 @@
     (swap! state (fn [s] (-> s
                              (assoc :actions history')
                              (update :cursor inc))))))
+
+
+(defn set-circle-diameter! [state id d]
+  (add-action! state [:set-diameter id d]))
+
+(defn add-circle! [state x y]
+  (add-action! state [:add-circle (generate-id! state) [x y default-radius]]))
+
 ;;
 
-(def default-radius 16)
-(defn px [v] (str v "px"))
+(defn count-entries [state]
+  (count (:actions @state)))
+
+(defn calculate-circles [actions]
+  (into [] (reduce (fn [circles [cmd id param]]
+                     (case cmd
+                       :init circles
+                       :add-circle (assoc circles id param)
+                       :set-diameter (update circles id (fn [[x y _]] [x y param]))))
+                   {} actions)))
+
+(defn select-current [state]
+  (-> @state :actions (subvec 0 (inc (:cursor @state)))))
+
+;;
+
 
 (defn circle-style [x y r]
   ;; the things I do for hover styles
@@ -61,8 +74,6 @@
    :transform "translate(-50%, -50%)"
    :border "1px solid black"})
 
-(defn set-circle-diameter! [state id d]
-  (add-action! state [:set-diameter id d]))
 
 (defn on-click-circle [id state e]
   (.stopPropagation e)
@@ -74,26 +85,17 @@
    {:class (<class circle-style x y r)
     :on-click (partial on-click-circle id state)}])
 
-(defn add-circle! [state x y]
-  (add-action! state [:add-circle (generate-id! state) [x y default-radius]]))
-
 (defn on-add-circle! [state e]
   (let [rect (-> e .-target .getBoundingClientRect)
         x (- (.-clientX e) (.-left rect))
         y (- (.-clientY e) (.-top rect))]
     (add-circle! state x y)))
 
-(defn constrain [min max value]
-  (Math/max min (Math/min max value)))
-
-(defn count-entries [state]
-  (count (:actions @state)))
-
-(defn undo! [state]
+(defn on-undo! [state]
   (let [dec-cursor (comp (partial constrain 0 (count-entries state)) dec)]
     (swap! state #(update-in % [:cursor] dec-cursor))))
 
-(defn redo! [state]
+(defn on-redo! [state]
   (let [inc-cursor (comp (partial constrain 0 (dec (count-entries state))) inc)]
     (swap! state #(update-in % [:cursor] inc-cursor))))
 
@@ -103,12 +105,18 @@
 (defn circles []
   (let [state (atom initial-state)]
     (fn []
-      [:div
-      ;;  (str (:cursor @state) (select-current state))
-       [:button {:on-click #(undo! state)} "Undo"]
-       [:button {:on-click #(redo! state)} "Redo"]
-       [:div {:style {:position "relative"
-                      :width "420px"
-                      :height "420px"}
-              :on-click (partial on-add-circle! state)}
-        (map (fn [v] ^{:key (gen-key v)} [circle state v]) (-> state select-current calculate-circles))]])))
+      [v-box
+       :gap "8px"
+       :children [[h-box
+                   :gap "8px"
+                   :children [[:button {:on-click #(on-undo! state)} "⏪ Undo"]
+                              [:button {:on-click #(on-redo! state)} "Redo ⏩"]]]
+                  [:div {:style {:position "relative"
+                                 :width "420px"
+                                 :height "420px"
+                                 :border "1px solid black"
+                                 :overflow "hidden"}
+                         :on-click (partial on-add-circle! state)}
+                   (map
+                    (fn [v] ^{:key (gen-key v)} [circle state v])
+                    (-> state select-current calculate-circles))]]])))
