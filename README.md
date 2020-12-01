@@ -1,6 +1,8 @@
 # roam-7guis
 
-This is the roam-7guis project.
+An implementation of [7guis](https://eugenkiss.github.io/7guis/tasks/) in ClojureScript.
+
+Live demo at: https://roam-7guis.herokuapp.com/
 
 ## Development mode
 
