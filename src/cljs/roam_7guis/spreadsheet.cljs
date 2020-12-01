@@ -3,8 +3,7 @@
             [clojure.pprint :as pp]
             [clojure.string :as string]
             [herb.core :refer [<class]]
-            [roam-7guis.parser :as parser]
-            [re-com.core :refer [h-box v-box]]))
+            [roam-7guis.parser :as parser]))
 
 (defn log [& args]
   (doseq [arg args]
@@ -16,11 +15,7 @@
 
 ;;
 
-(defn initial-state [] {:cells [[(atom {:content [:value "0"] :cache "0" :depends-on []}) (atom {:content [:value "0"] :cache "0" :depends-on []}) (atom {:content [:value "0"] :cache "0" :depends-on []})]
-                                [(atom {:content [:value "0"] :cache "0" :depends-on []}) (atom {:content [:value "0"] :cache ""  :depends-on []}) (atom {:content [:value "0"] :cache "0" :depends-on []})]
-                                [(atom {:content [:value "0"] :cache "0" :depends-on []}) (atom {:content [:value "0"] :cache "0" :depends-on []}) (atom {:content [:value "0"] :cache "0" :depends-on []})]]
-                        :references [[(atom []) (atom [])]
-                                     [(atom []) (atom [])]]})
+(def empty-cell {:content [:value "0"] :cache "0" :depends-on []})
 (def alpha "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 (defn coords->id [[x y]]
@@ -30,6 +25,12 @@
   (let [letter (string/replace id #"\d+" "")
         num (string/replace id #"[A-Z]+" "")]
     [(.indexOf alpha letter) (js/parseInt num)]))
+
+;;
+
+(defn initial-state [] {:cells [[(atom empty-cell) (atom empty-cell) (atom empty-cell)]
+                                [(atom empty-cell) (atom empty-cell) (atom empty-cell)]
+                                [(atom empty-cell) (atom empty-cell) (atom empty-cell)]]})
 
 (defn get-cell [matrix [x y]]
   (get (get matrix y) x))
@@ -54,10 +55,12 @@
       :value contents
       :formula (parser/evaluate-formula contents (partial get-cell-cache-id matrix)))))
 
-(defn parse-formula [formula]
+(defn parse-contents [formula]
   (cond
     (= (first formula) "=") [:formula (subs formula 1)]
     :else [:value formula]))
+
+;;
 
 (defn recalc-cell-id! [matrix id]
   (let [update-cache! (fn [cell] (swap! cell #(assoc % :cache (render-cell-id matrix id))))]
@@ -72,10 +75,9 @@
      (log ["change in" target-id "updating" watcher-id])
      (recalc-cell-id! matrix watcher-id))))
 
-
 (defn update-cell-id! [matrix id value]
   (log ["updating" id (id->coords id) value])
-  (let [formula (parse-formula value)
+  (let [formula (parse-contents value)
         update-content! (fn [cell] (swap! cell #(assoc % :content formula)))
         update-cache! (fn [cell] (swap! cell #(assoc % :cache (render-cell-id matrix id))))
         [formula-type body] formula
@@ -90,11 +92,9 @@
       (remove-watch (get-cell-id matrix d) id))
 
     (doseq [d new-deps]
-      (log ["hello" d])
       (watch-cell matrix d id))
 
     (update-in matrix (reverse (id->coords id)) update-deps!)))
-
 
 ;;
 
@@ -107,12 +107,15 @@
 
 (defn cell [id state]
   (let [contents (get-cell-id (:cells state) id)
+        editing (atom false)
         form (atom (format-contents @contents))]
     (fn []
-      [:div
-       [:input {:type "text" :value @form :on-change #(reset! form (-> % .-target .-value))}]
-       [:button {:on-click (fn [_] (update-cell-id! (:cells state) id @form))} "Save"]
-       [:div  "=" (str (render-cell-id (:cells state) id))]
+      [:div {:style {:width "64px"}}
+       (if @editing
+         [:div
+          [:input {:style {:width "48px"} :type "text" :value @form :on-change #(reset! form (-> % .-target .-value))}]
+          [:button {:on-click (fn [_] (update-cell-id! (:cells state) id @form) (reset! editing false))} "Save"]]
+         [:div {:on-click (fn [_] (reset! editing true))} (str (render-cell-id (:cells state) id))])
       ;;  [:div (str (:depends-on @contents))]
        ])))
 
@@ -121,12 +124,6 @@
 
 (defn spreadsheet []
   (let [state (initial-state)]
-    ;; (watch-cell (:cells state) "B1" "A0"
-    ;;             (fn [key _ _ new]
-    ;;               (update-cell-id! (:cells state) key (dec new))))
-    ;; (watch-cell (:cells state) "A0" "B0"
-    ;;             (fn [key _ _ new]
-    ;;               (update-cell-id! (:cells state) key (dec new))))
     (fn []
       [:div
        [:table
