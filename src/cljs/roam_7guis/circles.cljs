@@ -1,19 +1,7 @@
 (ns roam-7guis.circles
   (:require [reagent.core :as reagent :refer [atom]]
-            [clojure.pprint :as pp]
-            [clojure.string :as string]
             [herb.core :refer [<class]]
             [re-com.core :refer [h-box v-box]]))
-
-(defn log [& args]
-  (doseq [arg args]
-    (pp/pprint arg)))
-
-(defn set-state! [state key value]
-  ;; (log @state key value)
-  (swap! state #(assoc % key value)))
-
-;;
 
 (def default-radius 16)
 (defn px [v] (str v "px"))

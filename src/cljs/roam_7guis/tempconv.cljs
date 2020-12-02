@@ -1,5 +1,6 @@
 (ns roam-7guis.tempconv
   (:require [reagent.core :as reagent :refer [atom]]
+            [roam-7guis.util :as u]
             [re-com.core :refer [h-box]]))
 
 (defn c->f [c]
@@ -7,9 +8,6 @@
 
 (defn f->c [f]
   (* (/ 5 9) (- f 32)))
-
-(defn value [e]
-  (-> e .-target .-value))
 
 (defn valid-input? [t]
   (-> t js/Number.isNaN not))
@@ -46,7 +44,7 @@
                                      :f (f->c v))))
 
         on-edit (fn [field-state units e]
-                  (let [result (validate! (value e) field-state)]
+                  (let [result (validate! (u/value e) field-state)]
                     (when (:valid result) (update-internal! (:value result) units))))
 
         on-change-c #(on-edit input-c :c %)

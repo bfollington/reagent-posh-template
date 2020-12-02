@@ -1,18 +1,8 @@
 (ns roam-7guis.crud
   (:require [reagent.core :as reagent :refer [atom]]
-            [clojure.pprint :as pp]
             [clojure.string :as string]
+            [roam-7guis.util :as u]
             [re-com.core :refer [h-box v-box]]))
-
-(defn log [& args]
-  (doseq [arg args]
-    (pp/pprint arg)))
-
-(defn set-state! [state key value]
-  ;; (log @state key value)
-  (swap! state #(assoc % key value)))
-
-;;
 
 (def initial-state
   {:names {"0" ["Ben" "Follington"]
@@ -37,10 +27,10 @@
                  (string/starts-with? last filter-text)))))
 
 (defn set-selected-entry! [state value]
-  (set-state! state :selected-id value)
+  (u/set-state! state :selected-id value)
   (let [[first last] (get (:names @state) value)]
-    (set-state! state :edit-form {:first first
-                                  :last last})))
+    (u/set-state! state :edit-form {:first first
+                                    :last last})))
 
 (defn generate-id! [state]
   (swap! state #(update % :last-generated-id inc))
@@ -60,7 +50,7 @@
 
 (defn delete-entry! [state]
   (swap! state #(update-in % [:names] dissoc (:selected-id @state)))
-  (set-state! state :edit-form {:first "" :last ""}))
+  (u/set-state! state :edit-form {:first "" :last ""}))
 
 ;;
 
@@ -68,8 +58,7 @@
   [:select {:size 4
             :style {:width "256px"}
             :on-change (fn [e]
-                         (let [value (-> e .-target .-value)]
-                           (set-selected-entry! state value)))}
+                         (set-selected-entry! state (u/value e)))}
    (let [names (select-names state (:filter @state))]
      (map (fn [[i v]] [:option {:key i
                                 :value i} (format-name v)]) names))])
@@ -81,8 +70,7 @@
            :placeholder label
            :value (get-in @state path)
            :on-change (fn [e]
-                        (let [value (-> e .-target .-value)]
-                          (swap! state #(assoc-in % path value))))}])
+                        (swap! state #(assoc-in % path (u/value e))))}])
 
 (defn edit-form [state]
   [v-box
@@ -94,8 +82,8 @@
   [:input {:type "text"
            :placeholder "type to filter..."
            :value (:filter @state)
-           :on-change (fn [e] (let [value (-> e .-target .-value)]
-                                (set-state! state :filter value)))}])
+           :on-change (fn [e]
+                        (u/set-state! state :filter (u/value e)))}])
 
 (defn action-buttons [state]
   [h-box

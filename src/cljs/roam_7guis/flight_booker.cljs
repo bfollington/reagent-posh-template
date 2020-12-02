@@ -1,22 +1,10 @@
 (ns roam-7guis.flight-booker
   (:require [reagent.core :as reagent :refer [atom]]
-            [clojure.pprint :as pp]
+            [roam-7guis.util :as u]
             [cljs-time.core :as time]
             [cljs-time.format :refer [parse unparse formatter]]
             [re-com.core :refer [h-box box gap v-box hyperlink-href p]]))
 
-(defn value [e]
-  (-> e .-target .-value))
-
-(defn log [& args]
-  (doseq [arg args]
-    (pp/pprint arg)))
-
-(defn set-state! [state key value]
-  ;; (log @state key value)
-  (swap! state #(assoc % key value)))
-
-;;
 
 (def date-format (formatter "dd/MM/YYYY"))
 
@@ -52,7 +40,7 @@
 
 
 (defn set-flight-type! [state type]
-  (set-state! state :type type))
+  (u/set-state! state :type type))
 
 (defn show-popup! [state]
   (let [depart (->> state :depart-date :value)
@@ -81,8 +69,7 @@
                      (not (:valid field)) "#FF9999")}
            :disabled disabled
            :on-change (fn [e]
-                        (let [value (-> e .-target .-value)]
-                          (set-state! state key (validate-date value))))}])
+                        (u/set-state! state key (validate-date (u/value e))))}])
 
 (defn flight-booker []
   (let [state (atom {:type "one-way"

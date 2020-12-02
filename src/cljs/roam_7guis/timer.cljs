@@ -1,20 +1,11 @@
 (ns roam-7guis.timer
   (:require [reagent.core :as reagent :refer [atom]]
-            [clojure.pprint :as pp]
+            [roam-7guis.util :as u]
             [re-com.core :refer [h-box v-box]]))
 
-(defn log [& args]
-  (doseq [arg args]
-    (pp/pprint arg)))
-
-(defn set-state! [state key value]
-  ;; (log @state key value)
-  (swap! state #(assoc % key value)))
-
-;;
-
 (defn set-duration! [state duration]
-  (set-state! state :duration duration))
+  (u/set-state! state :duration duration))
+
 
 ;;
 
@@ -34,8 +25,7 @@
                        :min 0
                        :max 16
                        :on-change (fn [e]
-                                    (let [value (-> e .-target .-value)]
-                                      (set-duration! state value)))}]]])
+                                    (set-duration! state (u/value e)))}]]])
 
 (defn timer []
   (let [state (atom {:duration 10
@@ -53,4 +43,4 @@
        :children [[progress-bar (-> @state :current) (-> @state :duration)]
                   [:label (str (-> @state :current (.toFixed 2)) "s")]
                   [duration-slider state]
-                  [:button {:on-click #(set-state! state :current 0)} "Reset"]]])))
+                  [:button {:on-click #(u/set-state! state :current 0)} "Reset"]]])))

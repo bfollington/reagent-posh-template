@@ -1,9 +1,5 @@
 (ns roam-7guis.parser
-  (:require [clojure.pprint :as pp]))
-
-(defn log [& args]
-  (doseq [arg args]
-    (pp/pprint arg)))
+  (:require [roam-7guis.util :as u]))
 
 (defn find-deps [[op arg] deps]
   (case op
@@ -15,7 +11,7 @@
     (conj deps (str op arg))))
 
 (defn evaluate [get-cell-value [op arg]]
-  (log [op arg])
+  (u/log [op arg])
   (case op
     :value arg
     :formula (evaluate get-cell-value arg)
@@ -44,7 +40,7 @@
           result (evaluate get-cell-value [:formula parsed])
           deps (find-deps parsed [])]
 
-      (log ["evaluate-formula" result deps])
+      (u/log ["evaluate-formula" result deps])
       result)
     (catch js/Object _
       "#ERROR!")))

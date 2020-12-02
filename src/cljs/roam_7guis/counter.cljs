@@ -1,6 +1,6 @@
 (ns roam-7guis.counter
   (:require [reagent.core :as reagent :refer [atom]]
-            [re-com.core :refer [h-box box gap v-box hyperlink-href p]]))
+            [re-com.core :refer [h-box]]))
 
 (defn counter []
   (let [clicks (atom 0)

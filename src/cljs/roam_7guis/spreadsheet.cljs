@@ -1,17 +1,9 @@
 (ns roam-7guis.spreadsheet
   (:require [reagent.core :as reagent :refer [atom]]
-            [clojure.pprint :as pp]
+            [roam-7guis.util :as u]
             [clojure.string :as string]
             [herb.core :refer [<class]]
             [roam-7guis.parser :as parser]))
-
-(defn log [& args]
-  (doseq [arg args]
-    (pp/pprint arg)))
-
-(defn set-state! [state key value]
-  ;; (log @state key value)
-  (swap! state #(assoc % key value)))
 
 ;; util
 
@@ -79,7 +71,7 @@
    (get-cell matrix (id->coords target-id))
    watcher-id
    (fn [_ _ _ _]
-     (log ["change in" target-id "updating" watcher-id])
+     (u/log ["change in" target-id "updating" watcher-id])
      (recalc-cell-id! matrix watcher-id))))
 
 (defn update-cell-id! [matrix id value]
@@ -131,7 +123,7 @@
          [:div
           [:input {:style {:width "48px"}
                    :type "text" :value @form
-                   :on-change #(reset! form (-> % .-target .-value))
+                   :on-change #(reset! form (u/value %))
                    :on-key-down #(on-key-pressed state form editing id %)}]]
          [:div
           {:on-click (fn [_] (reset! editing true))}
