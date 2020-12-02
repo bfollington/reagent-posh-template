@@ -15,6 +15,8 @@
                     :cursor 0
                     :selected-circle-id nil})
 
+;; mutations
+
 (defn generate-id! [state]
   (swap! state #(update % :last-id inc))
   (:last-id @state))
@@ -33,7 +35,10 @@
 (defn add-circle! [state x y]
   (add-action! state [:add-circle (generate-id! state) [x y default-radius]]))
 
-;;
+(defn deselect-circle! [state]
+  (swap! state #(assoc-in % [:selected-circle-id] nil)))
+
+;; selectors
 
 (defn count-entries [state]
   (count (:actions @state)))
@@ -52,8 +57,7 @@
 (defn select-current [state]
   (-> @state :actions (subvec 0 (inc (:cursor @state)))))
 
-;;
-
+;; views -> circle
 
 (defn circle-style [x y r]
   ;; the things I do for hover styles
@@ -67,11 +71,10 @@
    :transform "translate(-50%, -50%)"
    :border "1px solid black"})
 
-
 (defn block-event [e]
   (.stopPropagation e))
 
-(defn on-edit-circle [id state e]
+(defn on-edit-circle! [id state e]
   (.stopPropagation e)
   (.preventDefault e)
   (u/set-state! state :selected-circle-id id))
@@ -81,16 +84,15 @@
   [:div
    {:class (<class circle-style x y r)
     :on-click block-event
-    :on-context-menu (partial on-edit-circle id state)}])
+    :on-context-menu (partial on-edit-circle! id state)}])
+
+;; views -> main canvas
 
 (defn on-add-circle! [state e]
   (let [rect (-> e .-target .getBoundingClientRect)
         x (- (.-clientX e) (.-left rect))
         y (- (.-clientY e) (.-top rect))]
     (add-circle! state x y)))
-
-(defn deselect-circle! [state]
-  (swap! state #(assoc-in % [:selected-circle-id] nil)))
 
 (defn on-undo! [state]
   (let [dec-cursor (comp (partial constrain 0 (count-entries state)) dec)]
@@ -123,6 +125,14 @@
                                :on-click #((do (set-circle-radius! state id @form)
                                                (deselect-circle! state)))}]]]}])))
 
+(defn canvas-style []
+  {:position "relative"
+   :width "420px"
+   :height "420px"
+   :border "1px solid #aaa"
+   :border-radius "3px"
+   :overflow "hidden"})
+
 (defn circles []
   (let [state (atom initial-state)]
     (fn []
@@ -135,12 +145,7 @@
                               [ui/button {:on-click #(on-redo! state) :label "Redo ⏩"}]]]
                   [:div {:style {:position "relative"}}
 
-                   [:div {:class (<class (fn [] {:position "relative"
-                                                 :width "420px"
-                                                 :height "420px"
-                                                 :border "1px solid #aaa"
-                                                 :border-radius "3px"
-                                                 :overflow "hidden"}))
+                   [:div {:class (<class canvas-style)
                           :on-click (partial on-add-circle! state)}
 
                     (map
