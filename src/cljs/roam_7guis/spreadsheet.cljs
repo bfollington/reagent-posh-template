@@ -1,6 +1,7 @@
 (ns roam-7guis.spreadsheet
   (:require [reagent.core :as reagent :refer [atom]]
             [roam-7guis.util :as u]
+            [roam-7guis.ui :as ui]
             [clojure.string :as string]
             [herb.core :refer [<class]]
             [roam-7guis.parser :as parser]))
@@ -113,12 +114,16 @@
                 (reset! editing false))
       ())))
 
+(defn cell-style []
+  (merge ui/font-style {:width "64px"
+                        :padding "2px 4px"}))
+
 (defn cell [id state]
   (let [contents (get-cell-id (:cells state) id)
         editing (atom false)
         form (atom (format-contents @contents))]
     (fn []
-      [:div {:style {:width "64px"}}
+      [:div {:class (<class cell-style)}
        (if @editing
          [:div
           [:input {:style {:width "48px"}
@@ -130,7 +135,15 @@
           (str (render-cell-id (:cells state) id))])])))
 
 (defn border-style []
-  {:border "1px solid #ccc"})
+  {:border "1px solid #ccc"
+   :background "white"})
+
+(defn header-style []
+  (merge ui/font-style {:background "#eee"
+                        :font-weight "bold"
+                        :min-width "64px"
+                        :padding "2px 4px"
+                        :text-align "right"}))
 
 (defn spreadsheet []
   (let [state (initial-state)]
@@ -141,16 +154,16 @@
         {:class (<class border-style)}
         [:thead
          [:tr
-          [:td {:class (<class border-style)} ""]
+          [:td {:class (<class header-style)} ""]
           (map (fn [a]
                  ^{:key a}
-                 [:td {:class (<class border-style)} a])
+                 [:td {:class (<class header-style)} a])
                (subs alpha 0 (colcount (:cells state))))]]
         [:tbody
          (map-indexed (fn [irow row]
                         ^{:key irow}
                         [:tr
-                         [:td {:class (<class border-style)} irow]
+                         [:td {:class (<class header-style)} irow]
                          (map (fn [icol]
                                 ^{:key icol}
                                 [:td
