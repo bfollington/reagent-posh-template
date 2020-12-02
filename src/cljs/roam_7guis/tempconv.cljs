@@ -1,6 +1,7 @@
 (ns roam-7guis.tempconv
   (:require [reagent.core :as reagent :refer [atom]]
             [roam-7guis.util :as u]
+            [roam-7guis.ui :as ui]
             [re-com.core :refer [h-box]]))
 
 (defn c->f [c]
@@ -56,14 +57,17 @@
     (fn []
       [h-box
        :gap "8px"
-       :children [[:input {:type "number"
-                           :style (temp-style (:valid @input-c))
-                           :value (:value @input-c)
-                           :on-change on-change-c}]
-                  [:label "Celcius"]
-                  [:label "="]
-                  [:input {:type "number"
-                           :style (temp-style (:valid @input-f))
-                           :value (:value @input-f)
-                           :on-change on-change-f}]
-                  [:label "Fahrenheit"]]])))
+       :align :center
+       :children [[ui/input-field
+                   {:type "number"
+                    :valid (:valid @input-c)
+                    :value (:value @input-c)
+                    :on-change on-change-c}]
+                  [ui/label "Celcius"]
+                  [ui/label "<=>"]
+                  [ui/input-field
+                   {:type "number"
+                    :valid (:valid @input-f)
+                    :value (:value @input-f)
+                    :on-change on-change-f}]
+                  [ui/label "Fahrenheit"]]])))
