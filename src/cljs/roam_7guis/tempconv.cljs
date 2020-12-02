@@ -1,6 +1,6 @@
 (ns roam-7guis.tempconv
   (:require [reagent.core :as reagent :refer [atom]]
-            [re-com.core :refer [h-box box gap v-box hyperlink-href p]]))
+            [re-com.core :refer [h-box]]))
 
 (defn c->f [c]
   (+ (* c (/ 9 5)) 32))
@@ -24,8 +24,17 @@
 (defn temp-style [valid]
   {:background (if valid "white" "#FF9999")})
 
+(defn mk-watch
+  [input-field-state units]
+  (fn [_ _ _ n]
+    (swap! input-field-state
+           #(assoc % :value
+                   (case units
+                     :c (Math/round n)
+                     :f (-> n c->f Math/round))))))
+
 (defn temp-conv []
-  (let [temp-internal (atom 5)
+  (let [temp-internal (atom 5) ;; "true value" in C
 
         input-c (atom {:value @temp-internal :valid true})
         input-f (atom {:value (c->f @temp-internal) :valid true})
@@ -36,22 +45,12 @@
                                      :c v
                                      :f (f->c v))))
 
-        ;; TODO(ben): this is gross af
-        mk-on-change (fn [input-field-state units]
-                       (fn [e]
-                         (let [result (validate! (value e) input-field-state)]
-                           (when (:valid result) (update-internal! (:value result) units)))))
+        on-edit (fn [field-state units e]
+                  (let [result (validate! (value e) field-state)]
+                    (when (:valid result) (update-internal! (:value result) units))))
 
-        mk-watch (fn [input-field-state units]
-                   (fn [_ _ _ n]
-                     (swap! input-field-state
-                            #(assoc % :value
-                                    (case units
-                                      :c (Math/round n)
-                                      :f (-> n c->f Math/round))))))
-
-        on-change-c (mk-on-change input-c :c)
-        on-change-f (mk-on-change input-f :f)]
+        on-change-c #(on-edit input-c :c %)
+        on-change-f #(on-edit input-c :c %)]
 
     (add-watch temp-internal :c (mk-watch input-c :c))
     (add-watch temp-internal :f (mk-watch input-f :f))
