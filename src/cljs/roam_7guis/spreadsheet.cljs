@@ -149,7 +149,8 @@
   (let [state (initial-state)]
     (fn []
       [:div
-       [:p "Click a cell to edit, hit enter to save changes. Formula's take the form of: =[:add [\"A0\" \"A1\"]]"]
+       [ui/p "Click a cell to edit, hit enter to save changes."]
+       [ui/p "Formulas take the form of: =[:ref \"A0\"] =[:add [\"A0\" \"A1\" ...]] =[:sub [\"A0\" \"A1\" ...]]"]
        [:table
         {:class (<class border-style)}
         [:thead

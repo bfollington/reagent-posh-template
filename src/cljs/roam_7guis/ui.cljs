@@ -26,6 +26,9 @@
 (defn label [txt]
   [:label {:class (<class label-style)} txt])
 
+(defn p [txt]
+  [:p {:class (<class label-style)} txt])
+
 (defn input-field-style [valid]
   (merge
    {:border "1px solid #ccc"
