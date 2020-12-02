@@ -14,8 +14,6 @@
 
     (conj deps (str op arg))))
 
-;; TODO(ben): catch errors and detect relf-referential links
-;; simplest way is a depth counter that bails on >1000 evaluates
 (defn evaluate [get-cell-value [op arg]]
   (log [op arg])
   (case op
@@ -29,17 +27,24 @@
                               (partial evaluate get-cell-value))
                         arg))
 
+    ;; should really be validating that this is a real cell ID
     (get-cell-value (str op arg))))
 
 (defn evaluate-deps [formula]
-  (let [parsed (cljs.reader/read-string formula)
-        deps (find-deps parsed [])]
-    deps))
+  (try
+    (let [parsed (cljs.reader/read-string formula)
+          deps (find-deps parsed [])]
+      deps)
+    (catch js/Object _
+      [])))
 
 (defn evaluate-formula [formula get-cell-value]
-  (let [parsed (cljs.reader/read-string formula)
-        result (evaluate get-cell-value [:formula parsed])
-        deps (find-deps parsed [])]
+  (try
+    (let [parsed (cljs.reader/read-string formula)
+          result (evaluate get-cell-value [:formula parsed])
+          deps (find-deps parsed [])]
 
-    (log ["evaluate-formula" result deps])
-    result))
+      (log ["evaluate-formula" result deps])
+      result)
+    (catch js/Object _
+      "#ERROR!")))
