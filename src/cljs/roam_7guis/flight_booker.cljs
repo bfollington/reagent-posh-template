@@ -56,8 +56,8 @@
 (defn flight-type [value state]
   [ui/select-field
    {:value value
-    :options [[:option {:value :one-way} "one-way flight"]
-              [:option {:value :return} "return flight"]]
+    :options [^{:key :one-way} [:option {:value "one-way"} "one-way flight"]
+              ^{:key :return} [:option {:value "return"} "return flight"]]
     :on-change (fn [e] (set-flight-type! state (u/value e)))}])
 
 (defn date-entry [field key state & {:keys [disabled] :or {disabled false}}]

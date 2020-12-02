@@ -60,6 +60,7 @@
   [ui/select-field
    {:size 4
     :style {:width "256px"}
+    :value (:selected-id @state)
     :on-change (fn [e]
                  (set-selected-entry! state (u/value e)))
     :options (let [names (select-names state (:filter @state))]
