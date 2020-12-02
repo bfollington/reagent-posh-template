@@ -1,6 +1,7 @@
 (ns roam-7guis.flight-booker
   (:require [reagent.core :as reagent :refer [atom]]
             [roam-7guis.util :as u]
+            [roam-7guis.ui :as ui]
             [cljs-time.core :as time]
             [cljs-time.format :refer [parse unparse formatter]]
             [re-com.core :refer [h-box box gap v-box hyperlink-href p]]))
@@ -53,21 +54,20 @@
 ;;
 
 (defn flight-type [value state]
-  [:select {:value value
-            :on-change (fn [e] (set-flight-type! state (u/value e)))}
-   [:option {:value :one-way} "one-way flight"]
-   [:option {:value :return} "return flight"]])
+  [ui/select-field
+   {:value value
+    :options [[:option {:value :one-way} "one-way flight"]
+              [:option {:value :return} "return flight"]]
+    :on-change (fn [e] (set-flight-type! state (u/value e)))}])
 
 (defn date-entry [field key state & {:keys [disabled] :or {disabled false}}]
-  [:input {:value (:value field)
-           :style {:background
-                   (cond
-                     (:valid field) "white"
-                     disabled "#eee"
-                     (not (:valid field)) "#FF9999")}
-           :disabled disabled
-           :on-change (fn [e]
-                        (u/set-state! state key (validate-date (u/value e))))}])
+  [ui/input-field
+   {:value (:value field)
+    :valid (:valid field)
+
+    :disabled disabled
+    :on-change (fn [e]
+                 (u/set-state! state key (validate-date (u/value e))))}])
 
 (defn flight-booker []
   (let [state (atom {:type "one-way"
@@ -79,7 +79,7 @@
       [v-box
        :width "256px"
        :gap "4px"
-       :children [[:p "Flights can only be booked in the future"]
+       :children [[ui/label "Flights can only be booked in the future"]
                   [flight-type (:type @state) state]
                   [date-entry (-> @state :depart-date) :depart-date state]
                   [date-entry
@@ -89,4 +89,4 @@
                    :disabled (or (-> @state :depart-date :valid not)
                                  (return-before-depart? @state)
                                  (is-one-way-flight? @state))]
-                  [:button {:on-click #(show-popup! @state)} "Book"]]])))
+                  [ui/button {:on-click #(show-popup! @state) :label "Book flight ✈️"}]]])))
