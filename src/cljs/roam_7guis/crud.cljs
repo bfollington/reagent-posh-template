@@ -20,7 +20,7 @@
 (defn format-name [[first last]]
   (str last ", " first))
 
-(defn select-names [state filter-text]
+(defn s->names [state filter-text]
   (->> @state
        :names
        (into [])
@@ -63,7 +63,7 @@
     :value (:selected-id @state)
     :on-change (fn [e]
                  (set-selected-entry! state (u/value e)))
-    :options (let [names (select-names state (:filter @state))]
+    :options (let [names (s->names state (:filter @state))]
                (map (fn [[i v]] [:option {:key i
                                           :value i} (format-name v)]) names))}])
 

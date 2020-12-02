@@ -40,8 +40,11 @@
 
 ;; selectors
 
-(defn count-entries [state]
+(defn s->count-entries [state]
   (count (:actions @state)))
+
+(defn s->select-current [state]
+  (-> @state :actions (subvec 0 (inc (:cursor @state)))))
 
 (defn calculate-circles [actions]
   (reduce (fn [circles [cmd id param]]
@@ -54,8 +57,6 @@
 (defn calculate-circles-list [actions]
   (into [] (calculate-circles actions)))
 
-(defn select-current [state]
-  (-> @state :actions (subvec 0 (inc (:cursor @state)))))
 
 ;; views -> circle
 
@@ -95,12 +96,12 @@
     (add-circle! state x y)))
 
 (defn on-undo! [state]
-  (let [dec-cursor (comp (partial constrain 0 (count-entries state)) dec)]
+  (let [dec-cursor (comp (partial constrain 0 (s->count-entries state)) dec)]
     (swap! state #(update-in % [:cursor] dec-cursor))
     (deselect-circle! state)))
 
 (defn on-redo! [state]
-  (let [inc-cursor (comp (partial constrain 0 (dec (count-entries state))) inc)]
+  (let [inc-cursor (comp (partial constrain 0 (dec (s->count-entries state))) inc)]
     (swap! state #(update-in % [:cursor] inc-cursor))
     (deselect-circle! state)))
 
@@ -150,10 +151,10 @@
 
                     (map
                      (fn [v] ^{:key (gen-key v)} [circle state v])
-                     (-> state select-current calculate-circles-list))]
+                     (-> state s->select-current calculate-circles-list))]
 
                    (let [selected (:selected-circle-id @state)
-                         circles (-> state select-current calculate-circles)]
+                         circles (-> state s->select-current calculate-circles)]
                      (when (some? selected)
                        (let [[y x r] (get circles selected)]
                          [edit-circle state selected [x y r]])))]]])))

@@ -25,17 +25,17 @@
     {:value date-str :valid valid}))
 
 
-(defn is-one-way-flight? [state]
+(defn s->one-way-flight? [state]
   (= (:type state) "one-way"))
 
-(defn get-dates [state]
+(defn s->dates [state]
   {:depart (->> state :depart-date :value (parse date-format))
    :return (->> state :return-date :value (parse date-format))})
 
-(defn return-before-depart? [state]
+(defn s->return-before-depart? [state]
   (if (and (-> state :depart-date :valid)
            (-> state :return-date :valid))
-    (let [{:keys [depart return]} (get-dates state)]
+    (let [{:keys [depart return]} (s->dates state)]
       (time/before? return depart))
     false))
 
@@ -87,6 +87,6 @@
                    :return-date
                    state
                    :disabled (or (-> @state :depart-date :valid not)
-                                 (return-before-depart? @state)
-                                 (is-one-way-flight? @state))]
+                                 (s->return-before-depart? @state)
+                                 (s->one-way-flight? @state))]
                   [ui/button {:on-click #(show-popup! @state) :label "Book flight ✈️"}]]])))

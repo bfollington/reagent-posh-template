@@ -34,24 +34,24 @@
 
 (defn initial-state [] {:cells (generate-cells 26 26)})
 
-(defn get-cell [matrix [x y]]
+(defn s->cell [matrix [x y]]
   (get (get matrix y) x))
 
-(defn get-cell-id [matrix id]
+(defn s->cell-id [matrix id]
   (let [coords (id->coords id)]
-    (get-cell matrix coords)))
+    (s->cell matrix coords)))
 
-(defn get-cell-field [matrix k id]
-  (k @(get-cell-id matrix id)))
+(defn s->cell-field [matrix k id]
+  (k @(s->cell-id matrix id)))
 
 ;; domain
 
 (defn render-cell-id [matrix id]
   ;; (log ["rendering" id])
-  (let [[type contents] (get-cell-field matrix :content id)]
+  (let [[type contents] (s->cell-field matrix :content id)]
     (case type
       :value contents
-      :formula (parser/evaluate-formula contents (partial get-cell-field matrix :cache)))))
+      :formula (parser/evaluate-formula contents (partial s->cell-field matrix :cache)))))
 
 (defn parse-contents [formula]
   (cond
@@ -69,7 +69,7 @@
 (defn watch-cell [matrix target-id watcher-id]
   ;; (log ["started watching" target-id "from" watcher-id])
   (add-watch
-   (get-cell matrix (id->coords target-id))
+   (s->cell matrix (id->coords target-id))
    watcher-id
    (fn [_ _ _ _]
      (u/log ["change in" target-id "updating" watcher-id])
@@ -81,7 +81,7 @@
         [formula-type body] formula
 
         deps (if (= formula-type :formula) (parser/evaluate-deps body) [])
-        old-deps (get-cell-field matrix :depends-on id)
+        old-deps (s->cell-field matrix :depends-on id)
         new-deps deps
 
         update-content! (fn [cell] (update-cell-field! cell :content formula))
@@ -89,7 +89,7 @@
         update-deps! (fn [cell] (update-cell-field! cell :depends-on deps))]
 
     (doseq [d old-deps]
-      (remove-watch (get-cell-id matrix d) id))
+      (remove-watch (s->cell-id matrix d) id))
 
     (doseq [d new-deps]
       (watch-cell matrix d id))
@@ -119,7 +119,7 @@
                         :padding "2px 4px"}))
 
 (defn cell [id state]
-  (let [contents (get-cell-id (:cells state) id)
+  (let [contents (s->cell-id (:cells state) id)
         editing (atom false)
         form (atom (format-contents @contents))]
     (fn []

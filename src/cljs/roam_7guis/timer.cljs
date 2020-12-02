@@ -41,7 +41,7 @@
       [v-box
        :width "256px"
        :gap "4px"
-       :children [[progress-bar (-> @state :current) (-> @state :duration)]
+       :children [[progress-bar (:current @state) (:duration @state)]
                   [ui/label (str (-> @state :current (.toFixed 2)) "s")]
                   [duration-slider state]
                   [ui/button {:on-click #(u/set-state! state :current 0) :label "Reset"}]]])))
