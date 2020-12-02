@@ -54,9 +54,7 @@
 
 (defn flight-type [value state]
   [:select {:value value
-            :on-change (fn [e]
-                         (let [value (-> e .-target .-value)]
-                           (set-flight-type! state value)))}
+            :on-change (fn [e] (set-flight-type! state (u/value e)))}
    [:option {:value :one-way} "one-way flight"]
    [:option {:value :return} "return flight"]])
 
