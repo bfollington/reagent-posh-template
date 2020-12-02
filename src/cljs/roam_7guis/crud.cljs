@@ -2,6 +2,7 @@
   (:require [reagent.core :as reagent :refer [atom]]
             [clojure.string :as string]
             [roam-7guis.util :as u]
+            [roam-7guis.ui :as ui]
             [re-com.core :refer [h-box v-box]]))
 
 (def initial-state
@@ -40,8 +41,9 @@
 ;; may be that I need to clear the selected-id on input
 (defn add-entry! [state]
   (let [form (:edit-form @state)
-        entry [(:first form) (:last form)]]
-    (swap! state #(assoc-in % [:names (generate-id! state)] entry))))
+        entry [(:first form) (:last form)]
+        id (generate-id! state)]
+    (swap! state #(assoc-in % [:names id] entry))))
 
 (defn update-entry! [state]
   (let [form (:edit-form @state)
@@ -55,22 +57,25 @@
 ;;
 
 (defn name-list [state]
-  [:select {:size 4
-            :style {:width "256px"}
-            :on-change (fn [e]
-                         (set-selected-entry! state (u/value e)))}
-   (let [names (select-names state (:filter @state))]
-     (map (fn [[i v]] [:option {:key i
-                                :value i} (format-name v)]) names))])
+  [ui/select-field
+   {:size 4
+    :style {:width "256px"}
+    :on-change (fn [e]
+                 (set-selected-entry! state (u/value e)))
+    :options (let [names (select-names state (:filter @state))]
+               (map (fn [[i v]] [:option {:key i
+                                          :value i} (format-name v)]) names))}])
 
 (defn raw-input
   "an input field that directly updates the atom storing its value"
   [state path label]
-  [:input {:type "text"
-           :placeholder label
-           :value (get-in @state path)
-           :on-change (fn [e]
-                        (swap! state #(assoc-in % path (u/value e))))}])
+  [ui/input-field
+   {:type "text"
+    :valid true
+    :placeholder label
+    :value (get-in @state path)
+    :on-change (fn [e]
+                 (swap! state #(assoc-in % path (u/value e))))}])
 
 (defn edit-form [state]
   [v-box
@@ -79,27 +84,28 @@
               [raw-input state [:edit-form :last] "Last name"]]])
 
 (defn filter-field [state]
-  [:input {:type "text"
-           :placeholder "type to filter..."
-           :value (:filter @state)
-           :on-change (fn [e]
-                        (u/set-state! state :filter (u/value e)))}])
+  [ui/input-field
+   {:type "text"
+    :valid true
+    :placeholder "type to filter..."
+    :value (:filter @state)
+    :on-change (fn [e]
+                 (u/set-state! state :filter (u/value e)))}])
 
 (defn action-buttons [state]
   [h-box
    :gap "8px"
-   :children [[:button {:on-click #(add-entry! state)} "Create"]
-              [:button {:on-click #(update-entry! state)} "Update"]
-              [:button {:on-click #(delete-entry! state)} "Delete"]]])
+   :children [[ui/button {:on-click #(add-entry! state) :label "➕ Create"}]
+              [ui/button {:on-click #(update-entry! state) :label "✏️ Update"}]
+              [ui/button {:on-click #(delete-entry! state) :label "🗑 Delete"}]]])
 
 (defn crud []
   (let [state (atom initial-state)]
     (fn []
       [v-box
-       :width "320px"
+       :width "420px"
        :gap "8px"
-       :children [[:div "Known issue: emptying the list and creating new entries will keep overwriting the same row"]
-                  [filter-field state]
+       :children [[filter-field state]
                   [h-box
                    :gap "8px"
                    :children [[name-list state]
