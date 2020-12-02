@@ -33,8 +33,10 @@
 (defn home-page []
   (fn []
     [:span.main
-     [:h1 "7guis in clojurescript (by bfollington)"]
+     [:h1 "7guis in clojurescript"]
+     [:h3 "by bfollington"]
      [:a {:href "https://github.com/bfollington/roam-7guis"} "view source"]
+     [:a {:href "https://twitter.com/vivavolt"} "find my on twitter"]
      [v-box
       :gap "16px"
       :children [[:div
