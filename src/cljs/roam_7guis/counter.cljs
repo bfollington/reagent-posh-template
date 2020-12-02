@@ -1,5 +1,6 @@
 (ns roam-7guis.counter
   (:require [reagent.core :as reagent :refer [atom]]
+            [roam-7guis.ui :as ui]
             [re-com.core :refer [h-box]]))
 
 (defn counter []
@@ -8,5 +9,7 @@
     (fn []
       [h-box
        :gap "8px"
-       :children [[:label @clicks]
-                  [:button {:on-click on-clicked} "Count"]]])))
+       :align :center
+       :children [[ui/label @clicks]
+                  [ui/button {:on-click on-clicked
+                              :label "Count"}]]])))
