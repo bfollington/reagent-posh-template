@@ -1,6 +1,7 @@
 (ns roam-7guis.timer
   (:require [reagent.core :as reagent :refer [atom]]
             [roam-7guis.util :as u]
+            [roam-7guis.ui :as ui]
             [re-com.core :refer [h-box v-box]]))
 
 (defn set-duration! [state duration]
@@ -13,13 +14,13 @@
   [h-box
    :gap "8px"
    :align :center
-   :children [[:label "Elapsed time"]
+   :children [[ui/label "Elapsed time"]
               [:progress {:style {:width "128px"} :value value :max max}]]])
 
 (defn duration-slider [state]
   [h-box
    :gap "8px"
-   :children [[:label "Duration"]
+   :children [[ui/label "Duration"]
               [:input {:type "range"
                        :value (:duration @state)
                        :min 0
@@ -41,6 +42,6 @@
        :width "256px"
        :gap "4px"
        :children [[progress-bar (-> @state :current) (-> @state :duration)]
-                  [:label (str (-> @state :current (.toFixed 2)) "s")]
+                  [ui/label (str (-> @state :current (.toFixed 2)) "s")]
                   [duration-slider state]
-                  [:button {:on-click #(u/set-state! state :current 0)} "Reset"]]])))
+                  [ui/button {:on-click #(u/set-state! state :current 0) :label "Reset"}]]])))
