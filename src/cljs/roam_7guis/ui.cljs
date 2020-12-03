@@ -30,20 +30,24 @@
 (defn p [txt]
   [:p {:class (<class label-css)} txt])
 
-(defn input-field-css [valid]
+(defn input-field-css [valid disabled]
   (merge
    {:border "1px solid #ccc"
-    :background (if valid "white" "#FF9999")
+    :background (cond
+                  disabled "#eee"
+                  valid "white"
+                  :else "#FF9999")
+
     :padding "4px 8px"
     :border-radius "4px"}
    font-css))
 
 (defn select-field-css []
-  (merge (input-field-css true)
+  (merge (input-field-css true false)
          {:min-width "256px"}))
 
 (defn input-field [{:keys [placeholder value on-change on-key-down type valid disabled]}]
-  [:input {:class (<class input-field-css valid)
+  [:input {:class (<class input-field-css valid disabled)
            :type type
            :placeholder placeholder
            :disabled disabled
