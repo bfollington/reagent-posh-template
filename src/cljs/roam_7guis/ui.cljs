@@ -42,9 +42,9 @@
     :border-radius "4px"}
    font-css))
 
-(defn select-field-css []
+(defn select-field-css [width]
   (merge (input-field-css true false)
-         {:min-width "210px"}))
+         {:width width}))
 
 (defn input-field [{:keys [placeholder value on-change on-key-down type valid disabled]}]
   [:input {:class (<class input-field-css valid disabled)
@@ -55,8 +55,8 @@
            :on-change on-change
            :on-key-down on-key-down}])
 
-(defn select-field [{:keys [value options on-change size]}]
-  [:select {:class (<class select-field-css)
+(defn select-field [{:keys [value options width on-change size]}]
+  [:select {:class (<class select-field-css width)
             :size size
             :value value
             :on-change on-change}

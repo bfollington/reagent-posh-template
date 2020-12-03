@@ -69,15 +69,15 @@
 ;;
 
 (defn name-list [state]
-  [:div {:style {:width "210px"}}
-   [ui/select-field
-    {:size 4
-     :value (:selected-id @state)
-     :on-change (fn [e]
-                  (set-selection! state (u/value e)))
-     :options (let [names (s->names state (:filter @state))]
-                (map (fn [[i v]] [:option {:key i
-                                           :value i} (format-name v)]) names))}]])
+  [ui/select-field
+   {:size 4
+    :width "210px"
+    :value (:selected-id @state)
+    :on-change (fn [e]
+                 (set-selection! state (u/value e)))
+    :options (let [names (s->names state (:filter @state))]
+               (map (fn [[i v]] [:option {:key i
+                                          :value i} (format-name v)]) names))}])
 
 (defn raw-input
   "an input field that directly updates the atom storing its value"
