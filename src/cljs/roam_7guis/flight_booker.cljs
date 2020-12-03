@@ -4,15 +4,12 @@
             [roam-7guis.ui :as ui]
             [cljs-time.core :as time]
             [cljs-time.format :refer [parse unparse formatter]]
-            [re-com.core :refer [h-box box gap v-box hyperlink-href p]]))
+            [re-com.core :refer [v-box]]))
 
 
 (def date-format (formatter "dd/MM/YYYY"))
 
 ;;
-
-(defn yesterday-at-midnight []
-  (time/plus (time/today-at-midnight) (time/days -1)))
 
 (defn validate-date [date-str]
   (let [date (try
@@ -81,7 +78,8 @@
       [v-box
        :width "256px"
        :gap "4px"
-       :children [[flight-type (:type @state) state]
+       :children [[ui/p "Greetings Americans, please use DD/MM/YYYY format for this particular interface."]
+                  [flight-type (:type @state) state]
                   [date-entry (-> @state :depart-date) :depart-date state]
                   [date-entry
                    (-> @state :return-date)
