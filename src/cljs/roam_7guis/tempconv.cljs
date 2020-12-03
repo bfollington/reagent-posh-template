@@ -49,7 +49,7 @@
                     (when (:valid result) (update-internal! (:value result) units))))
 
         on-change-c #(on-edit input-c :c %)
-        on-change-f #(on-edit input-c :c %)]
+        on-change-f #(on-edit input-f :f %)]
 
     (add-watch temp-internal :c (mk-watch input-c :c))
     (add-watch temp-internal :f (mk-watch input-f :f))
