@@ -16,8 +16,9 @@
     :border-radius "4px"}
    font-css))
 
-(defn button [{:keys [label on-click]}]
+(defn button [{:keys [label on-click disabled]}]
   [:button {:on-click on-click
+            :disabled disabled
             :class (<class button-css)} label])
 
 (defn label-css []

@@ -13,7 +13,11 @@
    :filter ""
    :edit-form {:first ""
                :last ""}
-   :selected-id "-1"})
+   :selected-id nil})
+
+(defn valid-name-form? [state]
+  (and (-> @state :edit-form :first (string/blank?) (not))
+       (-> @state :edit-form :last (string/blank?) (not))))
 
 ;;
 
@@ -27,9 +31,9 @@
        (filter (fn [[_ [_ last]]]
                  (string/starts-with? last filter-text)))))
 
-(defn set-selected-entry! [state value]
-  (u/set-state! state :selected-id value)
-  (let [[first last] (get (:names @state) value)]
+(defn set-selection! [state id]
+  (u/set-state! state :selected-id id)
+  (let [[first last] (get (:names @state) id)]
     (u/set-state! state :edit-form {:first first
                                     :last last})))
 
@@ -37,22 +41,29 @@
   (swap! state #(update % :last-generated-id inc))
   (str (:last-generated-id @state)))
 
+(defn clear-selection! [state]
+  (u/set-state! state :edit-form {:first "" :last ""})
+  (swap! state #(assoc % :selected-id nil)))
+
 ;; there's a bug here, when the list is empty each thing you "add" overwrites itself
 ;; may be that I need to clear the selected-id on input
 (defn add-entry! [state]
   (let [form (:edit-form @state)
         entry [(:first form) (:last form)]
         id (generate-id! state)]
-    (swap! state #(assoc-in % [:names id] entry))))
+    (swap! state #(assoc-in % [:names id] entry))
+    (clear-selection! state)))
 
 (defn update-entry! [state]
   (let [form (:edit-form @state)
         entry [(:first form) (:last form)]]
-    (swap! state #(assoc-in % [:names (:selected-id @state)] entry))))
+    (swap! state #(assoc-in % [:names (:selected-id @state)] entry))
+    (clear-selection! state)))
 
 (defn delete-entry! [state]
   (swap! state #(update-in % [:names] dissoc (:selected-id @state)))
-  (u/set-state! state :edit-form {:first "" :last ""}))
+  (clear-selection! state))
+
 
 ;;
 
@@ -62,7 +73,7 @@
     :style {:width "256px"}
     :value (:selected-id @state)
     :on-change (fn [e]
-                 (set-selected-entry! state (u/value e)))
+                 (set-selection! state (u/value e)))
     :options (let [names (s->names state (:filter @state))]
                (map (fn [[i v]] [:option {:key i
                                           :value i} (format-name v)]) names))}])
@@ -91,14 +102,16 @@
     :placeholder "type to filter..."
     :value (:filter @state)
     :on-change (fn [e]
-                 (u/set-state! state :filter (u/value e)))}])
+                 (u/set-state! state :filter (u/value e))
+                 (clear-selection! state))}])
 
 (defn action-buttons [state]
-  [h-box
-   :gap "8px"
-   :children [[ui/button {:on-click #(add-entry! state) :label "➕ Create"}]
-              [ui/button {:on-click #(update-entry! state) :label "✏️ Update"}]
-              [ui/button {:on-click #(delete-entry! state) :label "🗑 Delete"}]]])
+  (let [has-selection (some? (:selected-id @state))]
+    [h-box
+     :gap "8px"
+     :children [[ui/button {:on-click #(add-entry! state) :disabled (not (valid-name-form? state)) :label "➕ Create"}]
+                [ui/button {:on-click #(update-entry! state) :disabled (not has-selection) :label "✏️ Update"}]
+                [ui/button {:on-click #(delete-entry! state) :disabled (not has-selection) :label "🗑 Delete"}]]]))
 
 (defn crud []
   (let [state (atom initial-state)]
