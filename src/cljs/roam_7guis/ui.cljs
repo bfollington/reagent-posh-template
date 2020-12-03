@@ -42,10 +42,11 @@
   (merge (input-field-css true)
          {:min-width "256px"}))
 
-(defn input-field [{:keys [placeholder value on-change on-key-down type valid]}]
+(defn input-field [{:keys [placeholder value on-change on-key-down type valid disabled]}]
   [:input {:class (<class input-field-css valid)
            :type type
            :placeholder placeholder
+           :disabled disabled
            :value value
            :on-change on-change
            :on-key-down on-key-down}])
