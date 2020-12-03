@@ -13,7 +13,7 @@
    :filter ""
    :edit-form {:first ""
                :last ""}
-   :selected-id nil})
+   :selected-id js/undefined})
 
 (defn valid-name-form? [state]
   (and (-> @state :edit-form :first (string/blank?) (not))
@@ -43,7 +43,7 @@
 
 (defn clear-selection! [state]
   (u/set-state! state :edit-form {:first "" :last ""})
-  (swap! state #(assoc % :selected-id nil)))
+  (swap! state #(assoc % :selected-id js/undefined)))
 
 ;; there's a bug here, when the list is empty each thing you "add" overwrites itself
 ;; may be that I need to clear the selected-id on input
@@ -106,7 +106,7 @@
                  (clear-selection! state))}])
 
 (defn action-buttons [state]
-  (let [has-selection (some? (:selected-id @state))]
+  (let [has-selection (exists? (:selected-id @state))]
     [h-box
      :gap "8px"
      :children [[ui/button {:on-click #(add-entry! state) :disabled (not (valid-name-form? state)) :label "➕ Create"}]
