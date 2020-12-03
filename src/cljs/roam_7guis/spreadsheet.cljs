@@ -147,7 +147,8 @@
           :text-align "right"}))
 
 (defn spreadsheet []
-  (let [state (initial-state)]
+  (let [state (initial-state)
+        header-row (subs alpha 0 (colcount (:cells state)))]
     (fn []
       [:div
        [ui/p "Click a cell to edit, hit enter to save changes."]
@@ -160,7 +161,7 @@
           (map (fn [a]
                  ^{:key a}
                  [:td {:class (<class header-css)} a])
-               (subs alpha 0 (colcount (:cells state))))]]
+               header-row)]]
         [:tbody
          (map-indexed (fn [irow row]
                         ^{:key irow}
