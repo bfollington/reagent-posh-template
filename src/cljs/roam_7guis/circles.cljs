@@ -123,8 +123,9 @@
                                       :on-change #(reset! form (u/value %))}]
                              [ui/button
                               {:label "Save"
-                               :on-click #((do (set-circle-radius! state id @form)
-                                               (deselect-circle! state)))}]]]}])))
+                               :on-click (fn [_]
+                                           (deselect-circle! state)
+                                           (set-circle-radius! state id @form))}]]]}])))
 
 (defn canvas-css []
   {:position "relative"
