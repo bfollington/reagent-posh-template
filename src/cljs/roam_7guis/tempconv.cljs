@@ -20,7 +20,7 @@
     (reset! state out)
     out))
 
-(defn temp-style [valid]
+(defn temp-css [valid]
   {:background (if valid "white" "#FF9999")})
 
 (defn mk-watch

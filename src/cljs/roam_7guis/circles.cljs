@@ -60,7 +60,7 @@
 
 ;; views -> circle
 
-(defn circle-style [x y r]
+(defn circle-css [x y r]
   ;; the things I do for hover styles
   ^{:pseudo {:hover {:background "rgba(0, 0, 0, 0.2)"}}}
   {:position "absolute"
@@ -83,7 +83,7 @@
 (defn circle [state [id [x y r]]]
   ^{:key (str x y r)}
   [:div
-   {:class (<class circle-style x y r)
+   {:class (<class circle-css x y r)
     :on-click block-event
     :on-context-menu (partial on-edit-circle! id state)}])
 
@@ -126,7 +126,7 @@
                                :on-click #((do (set-circle-radius! state id @form)
                                                (deselect-circle! state)))}]]]}])))
 
-(defn canvas-style []
+(defn canvas-css []
   {:position "relative"
    :width "420px"
    :height "420px"
@@ -146,7 +146,7 @@
                               [ui/button {:on-click #(on-redo! state) :label "Redo ⏩"}]]]
                   [:div {:style {:position "relative"}}
 
-                   [:div {:class (<class canvas-style)
+                   [:div {:class (<class canvas-css)
                           :on-click (partial on-add-circle! state)}
 
                     (map

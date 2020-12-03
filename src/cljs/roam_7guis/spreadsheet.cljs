@@ -114,16 +114,16 @@
                 (reset! editing false))
       ())))
 
-(defn cell-style []
-  (merge ui/font-style {:width "64px"
-                        :padding "2px 4px"}))
+(defn cell-css []
+  (merge ui/font-css {:width "64px"
+                      :padding "2px 4px"}))
 
 (defn cell [id state]
   (let [contents (s->cell-id (:cells state) id)
         editing (atom false)
         form (atom (format-contents @contents))]
     (fn []
-      [:div {:class (<class cell-style)}
+      [:div {:class (<class cell-css)}
        (if @editing
          [:div
           [:input {:style {:width "48px"}
@@ -134,16 +134,17 @@
           {:on-click (fn [_] (reset! editing true))}
           (str (render-cell-id (:cells state) id))])])))
 
-(defn border-style []
+(defn border-css []
   {:border "1px solid #ccc"
    :background "white"})
 
-(defn header-style []
-  (merge ui/font-style {:background "#eee"
-                        :font-weight "bold"
-                        :min-width "64px"
-                        :padding "2px 4px"
-                        :text-align "right"}))
+(defn header-css []
+  (merge ui/font-css
+         {:background "#eee"
+          :font-weight "bold"
+          :min-width "64px"
+          :padding "2px 4px"
+          :text-align "right"}))
 
 (defn spreadsheet []
   (let [state (initial-state)]
@@ -152,23 +153,23 @@
        [ui/p "Click a cell to edit, hit enter to save changes."]
        [ui/p "Formulas take the form of: =[:ref \"A0\"] =[:add [\"A0\" \"A1\" ...]] =[:sub [\"A0\" \"A1\" ...]]"]
        [:table
-        {:class (<class border-style)}
+        {:class (<class border-css)}
         [:thead
          [:tr
-          [:td {:class (<class header-style)} ""]
+          [:td {:class (<class header-css)} ""]
           (map (fn [a]
                  ^{:key a}
-                 [:td {:class (<class header-style)} a])
+                 [:td {:class (<class header-css)} a])
                (subs alpha 0 (colcount (:cells state))))]]
         [:tbody
          (map-indexed (fn [irow row]
                         ^{:key irow}
                         [:tr
-                         [:td {:class (<class header-style)} irow]
+                         [:td {:class (<class header-css)} irow]
                          (map (fn [icol]
                                 ^{:key icol}
                                 [:td
-                                 {:class (<class border-style)}
+                                 {:class (<class border-css)}
                                  [cell (coords->id [icol irow]) state]])
                               (range (count row)))])
                       (:cells state))]]])))
