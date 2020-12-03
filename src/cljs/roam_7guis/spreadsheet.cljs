@@ -152,7 +152,13 @@
     (fn []
       [:div
        [ui/p "Click a cell to edit, hit enter to save changes."]
-       [ui/p "Formulas take the form of: =[:ref \"A0\"] =[:add [\"A0\" \"A1\" ...]] =[:sub [\"A0\" \"A1\" ...]]"]
+       [ui/p "Formulas take the form of: "]
+       [:ul
+        [:li [ui/label "=[:ref \"A0\"]"]]
+        [:li [ui/label "=[:add [\"A0\" \"A1\" ...]]"]]
+        [:li [ui/label "=[:sub [\"A0\" \"A1\" ...]]"]]
+        [:li [ui/label "=[:mul [\"A0\" \"A1\" ...]]"]]
+        [:li [ui/label "=[:div [\"A0\" \"A1\" ...]]"]]]
        [:table
         {:class (<class border-css)}
         [:thead

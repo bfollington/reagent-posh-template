@@ -2,29 +2,34 @@
   (:require [roam-7guis.util :as u]))
 
 (defn find-deps [[op arg] deps]
-  (case op
-    :formula (find-deps arg deps)
-    :ref (conj deps arg)
-    :add (reduce concat (map #(find-deps % []) arg))
-    :sub (reduce concat (map #(find-deps % []) arg))
+  (let [arg-list-deps (reduce concat (map #(find-deps % []) arg))]
+    (case op
+      :formula (find-deps arg deps)
+      :ref (conj deps arg)
+      :add arg-list-deps
+      :sub arg-list-deps
+      :mul arg-list-deps
+      :div arg-list-deps
 
-    (conj deps (str op arg))))
+      (conj deps (str op arg)))))
 
 (defn evaluate [get-cell-value [op arg]]
   (u/log [op arg])
-  (case op
-    :value arg
-    :formula (evaluate get-cell-value arg)
-    :ref (get-cell-value arg)
-    :add (reduce + (map (comp js/parseInt
-                              (partial evaluate get-cell-value))
-                        arg))
-    :sub (reduce - (map (comp js/parseInt
-                              (partial evaluate get-cell-value))
-                        arg))
+  (let [eval-operator (fn [op]
+                        (reduce op (map
+                                    (comp js/parseInt (partial evaluate get-cell-value))
+                                    arg)))]
+    (case op
+      :value arg
+      :formula (evaluate get-cell-value arg)
+      :ref (get-cell-value arg)
+      :add (eval-operator +)
+      :sub (eval-operator -)
+      :mul (eval-operator *)
+      :div (eval-operator /)
 
     ;; should really be validating that this is a real cell ID
-    (get-cell-value (str op arg))))
+      (get-cell-value (str op arg)))))
 
 (defn evaluate-deps [formula]
   (try
