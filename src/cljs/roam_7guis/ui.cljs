@@ -44,7 +44,7 @@
 
 (defn select-field-css []
   (merge (input-field-css true false)
-         {:min-width "256px"}))
+         {:min-width "210px"}))
 
 (defn input-field [{:keys [placeholder value on-change on-key-down type valid disabled]}]
   [:input {:class (<class input-field-css valid disabled)

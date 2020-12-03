@@ -3,6 +3,7 @@
             [clojure.string :as string]
             [roam-7guis.util :as u]
             [roam-7guis.ui :as ui]
+            [herb.core :refer [<class]]
             [re-com.core :refer [h-box v-box]]))
 
 (def initial-state
@@ -68,15 +69,15 @@
 ;;
 
 (defn name-list [state]
-  [ui/select-field
-   {:size 4
-    :style {:width "256px"}
-    :value (:selected-id @state)
-    :on-change (fn [e]
-                 (set-selection! state (u/value e)))
-    :options (let [names (s->names state (:filter @state))]
-               (map (fn [[i v]] [:option {:key i
-                                          :value i} (format-name v)]) names))}])
+  [:div {:style {:width "210px"}}
+   [ui/select-field
+    {:size 4
+     :value (:selected-id @state)
+     :on-change (fn [e]
+                  (set-selection! state (u/value e)))
+     :options (let [names (s->names state (:filter @state))]
+                (map (fn [[i v]] [:option {:key i
+                                           :value i} (format-name v)]) names))}]])
 
 (defn raw-input
   "an input field that directly updates the atom storing its value"
@@ -94,6 +95,15 @@
    :gap "4px"
    :children [[raw-input state [:edit-form :first] "First name"]
               [raw-input state [:edit-form :last] "Last name"]]])
+
+(defn filter-wrapper-css []
+  {:width "50%"
+   :display "flex"
+   :flex-direction "column"
+   :align-items "stretch"})
+
+(defn filter-wrapper [children]
+  [:div {:class (<class filter-wrapper-css)} children])
 
 (defn filter-field [state]
   [ui/input-field
@@ -119,7 +129,7 @@
       [v-box
        :width "420px"
        :gap "8px"
-       :children [[filter-field state]
+       :children [[filter-wrapper [filter-field state]]
                   [h-box
                    :gap "8px"
                    :children [[name-list state]
