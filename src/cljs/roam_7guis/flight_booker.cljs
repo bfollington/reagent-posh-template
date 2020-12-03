@@ -19,14 +19,16 @@
                (parse date-format date-str)
                (catch :default _
                  :invalid))
-        valid (if (not (= date :invalid))
-                (time/after? date (yesterday-at-midnight)) ;; dates must be in the future
-                false)]
+        valid (not (= date :invalid))]
     {:value date-str :valid valid}))
 
 
 (defn s->one-way-flight? [state]
   (= (:type state) "one-way"))
+
+(defn s->return-flight? [state]
+  (= (:type state) "return"))
+
 
 (defn s->dates [state]
   {:depart (->> state :depart-date :value (parse date-format))
@@ -79,14 +81,16 @@
       [v-box
        :width "256px"
        :gap "4px"
-       :children [[ui/label "Flights can only be booked in the future"]
-                  [flight-type (:type @state) state]
+       :children [[flight-type (:type @state) state]
                   [date-entry (-> @state :depart-date) :depart-date state]
                   [date-entry
                    (-> @state :return-date)
                    :return-date
                    state
-                   :disabled (or (-> @state :depart-date :valid not)
-                                 (s->return-before-depart? @state)
-                                 (s->one-way-flight? @state))]
-                  [ui/button {:on-click #(show-popup! @state) :label "Book flight ✈️"}]]])))
+                   :disabled (s->one-way-flight? @state)]
+                  [ui/button {:on-click #(show-popup! @state)
+                              :disabled (or (-> @state :depart-date :valid not)
+                                            (and
+                                             (s->return-flight? @state)
+                                             (s->return-before-depart? @state)))
+                              :label "Book flight ✈️"}]]])))
