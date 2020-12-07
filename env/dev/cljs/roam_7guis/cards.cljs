@@ -9,7 +9,8 @@
             [roam-7guis.timer :as timer]
             [roam-7guis.crud :as crud]
             [roam-7guis.circles :as circles]
-            [roam-7guis.spreadsheet :as spreadsheet])
+            [roam-7guis.spreadsheet :as spreadsheet]
+            [roam-7guis.bullet-journal :as journal])
   (:require-macros
    [devcards.core
     :as dc
@@ -35,6 +36,9 @@
 
 (defcard-rg spreadsheet
   (spreadsheet/spreadsheet))
+
+(defcard-rg bullet-journal
+  (journal/journal))
 
 (rdom/render [:div] (.getElementById js/document "app"))
 
