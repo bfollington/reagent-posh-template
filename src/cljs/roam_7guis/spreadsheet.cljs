@@ -6,6 +6,13 @@
             [herb.core :refer [<class]]
             [roam-7guis.parser :as parser]))
 
+;; NOTE(ben): if/when motivation to improve this strikes, probably worth moving to either:
+;;  1. an S-expr based syntax (sum A0 A1 A2), (range A0 A99) etc. uses standard LISP rules
+;;  2. instaparse / ENBF + standard Excel notation =SUM(A0:A99) 
+;;        see: https://www.ics.uci.edu/~pattis/ICS-33/lectures/ebnf.pdf
+;;             https://github.com/taoroalin/seven-guis/blob/main/src/cells.insta
+;;  3. write my own (unlikely, see https://github.com/euccastro/seven-guis/blob/master/src/seven_guis/cells/formula.cljs)
+
 ;; util
 
 (def empty-cell {:content [:value "0"] :cache "0" :depends-on []})
