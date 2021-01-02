@@ -1,14 +1,10 @@
 (ns in-passing.calendar
   (:require [reagent.core :as reagent :refer [atom]]
-            [clojure.test :refer [deftest is]]
-            [clojure.string :as string]
-            [in-passing.util :as u]
-            [in-passing.ui :as ui]
             [herb.core :refer [<class]]
             [re-com.core :refer [h-box v-box]]
             [in-passing.days :as d]
             [in-passing.ui.days :as dui]
-            [in-passing.color :as col]
+            [in-passing.util :as u]
             [goog.string :as gstring]
             [goog.string.format]))
 
@@ -44,15 +40,38 @@
 (defn text-css []
   {:font-size "4px"})
 
+(defn calc-day-state [d today]
+  (cond
+    (< d today) :past
+    (= d today) :today
+    (> d today) :default))
+
+(defn get-active-piece [d events]
+  (when (some? d)
+    (let [day-events (get events d)
+          active (->> day-events
+                      (filter (fn [[_ _ s]] (= s :active)))
+                      (first))]
+      active)))
+
 (defn calendar []
   (let [mpos (atom [0 0])
-        letters (atom (grid 8 8))
         days (d/gen-month 31)
-        today (atom 3)]
+        events (atom {7 [[:king "Appt/ Dr. King" :active]
+                         [:pawn "Work" :taken]]
+                      9 [[:pawn "Work" :active]]
+                      16 [[:pawn "Work" :active]]
+                      23 [[:pawn "Work" :active]]})
+        selected (atom nil)
+        today (atom 3)
+
+        on-selected (fn [d _] (u/log d "test") (reset! selected d))]
     (fn []
-      (let [[mx my] @mpos]
+      (let [[mx my] @mpos
+            active-piece (get-active-piece @selected @events)]
         [:div
          [:button {:on-click (fn [e] (swap! today inc))} "Next Day"]
+         [:div (str @selected) (str active-piece)]
          [:table
           [:thead
           ;;  [:tr
@@ -70,6 +89,8 @@
                          [:tr
                           (doall (map (fn [d]
                                         ^{:key d}
-                                        [:td [dui/day d {:state (if (= d @today) :today :default)}]])
+                                        [:td [dui/day d {:state (calc-day-state d @today)
+                                                         :on-selected (partial on-selected d)
+                                                         :events (get @events d)}]])
                                       wk))])
                        days))]]]))))
