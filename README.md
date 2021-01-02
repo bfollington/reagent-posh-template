@@ -1,8 +1,8 @@
-# roam-7guis
+# in-passing
 
-An implementation of [7guis](https://eugenkiss.github.io/7guis/tasks/) in ClojureScript.
+Play chess on your calendar to get out of every social obligation you can.
 
-Live demo at: https://roam-7guis.herokuapp.com/
+Written in clojurescript + re-frame, using lein-figwheel.
 
 ## Development mode
 
