@@ -1,9 +1,9 @@
 {
   "calva.replConnectSequences": [
     {
-        "name": "Devcards - 7guis",
+        "name": "Devcards - in-passing",
         "projectType": "Leiningen",
-        "cljsType": "Figwheel Main",
+        "cljsType": "lein-figwheel",
         "menuSelections": {
             "cljsLaunchBuilds": [
                 "devcards",

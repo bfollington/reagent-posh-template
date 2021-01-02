@@ -1,4 +1,4 @@
-(defproject roam-7guis "0.1.0-SNAPSHOT"
+(defproject in-passing "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -28,12 +28,12 @@
             [lein-asset-minifier "0.4.6"
              :exclusions [org.clojure/clojure]]]
 
-  :ring {:handler roam-7guis.handler/app
-         :uberwar-name "roam-7guis.war"}
+  :ring {:handler in-passing.handler/app
+         :uberwar-name "in-passing.war"}
 
   :min-lein-version "2.5.0"
-  :uberjar-name "roam-7guis.jar"
-  :main roam-7guis.server
+  :uberjar-name "in-passing.jar"
+  :main in-passing.server
   :clean-targets ^{:protect false}
   [:target-path
    [:cljsbuild :builds :app :compiler :output-dir]
@@ -58,9 +58,9 @@
               :pretty-print  false}}
             :app
             {:source-paths ["src/cljs" "src/cljc" "env/dev/cljs"]
-             :figwheel {:on-jsload "roam-7guis.core/mount-root"}
+             :figwheel {:on-jsload "in-passing.core/mount-root"}
              :compiler
-             {:main "roam-7guis.dev"
+             {:main "in-passing.dev"
               :asset-path "/js/out"
               :output-to "target/cljsbuild/public/js/app.js"
               :output-dir "target/cljsbuild/public/js/out"
@@ -72,7 +72,7 @@
             :devcards
             {:source-paths ["src/cljs" "src/cljc" "env/dev/cljs"]
              :figwheel {:devcards true}
-             :compiler {:main "roam-7guis.cards"
+             :compiler {:main "in-passing.cards"
                         :asset-path "js/devcards_out"
                         :output-to "target/cljsbuild/public/js/app_devcards.js"
                         :output-dir "target/cljsbuild/public/js/devcards_out"
@@ -86,11 +86,11 @@
    :nrepl-port 7002
    :nrepl-middleware [cider.piggieback/wrap-cljs-repl]
    :css-dirs ["resources/public/css"]
-   :ring-handler roam-7guis.handler/app}
+   :ring-handler in-passing.handler/app}
 
 
 
-  :profiles {:dev {:repl-options {:init-ns roam-7guis.repl}
+  :profiles {:dev {:repl-options {:init-ns in-passing.repl}
                    :dependencies [[cider/piggieback "0.5.1"]
                                   [binaryage/devtools "1.0.2"]
                                   [ring/ring-mock "0.4.0"]
