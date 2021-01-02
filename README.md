@@ -2,6 +2,8 @@
 
 Play chess on your calendar to get out of every social obligation you can.
 
+![](https://raw.githubusercontent.com/bfollington/in-passing/master/resources/public/screenshot.png?token=ABGG7JE37KYAWYIBHANUL6276AFTI)
+
 Written in clojurescript + re-frame, using lein-figwheel.
 
 ## Development mode
