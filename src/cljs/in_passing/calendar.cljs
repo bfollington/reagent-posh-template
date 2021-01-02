@@ -7,6 +7,8 @@
             [herb.core :refer [<class]]
             [re-com.core :refer [h-box v-box]]
             [in-passing.days :as d]
+            [in-passing.ui.days :as dui]
+            [in-passing.color :as col]
             [goog.string :as gstring]
             [goog.string.format]))
 
@@ -42,37 +44,6 @@
 (defn text-css []
   {:font-size "4px"})
 
-(defn day-css []
-  ^{:pseudo {:hover {:background "rgba(0, 0, 0, 0.2)"}}}
-  {:position "relative"
-   :width "96px"
-   :height "96px"
-   :border "1px solid black"
-   :transition "background 0.2s"})
-
-(defn day-number-css []
-  {:position "absolute"
-   :font-family "Indie Flower"
-   :font-size "24px"
-   :right "8px"
-   :bottom 0})
-
-(defn day-circle-css []
-  {:position "absolute"
-   :width "32px"
-   :right "-8px"
-   :bottom "-3px"})
-
-(defn day [date {:keys [state]}]
-  [:div
-   {:class (<class day-css)}
-
-   [:div {:class (<class day-number-css)}
-    (if (= state :today)
-      [:img {:class (<class day-circle-css)
-             :src "/assets/scribble.svg"}])
-    date]])
-
 (defn calendar []
   (let [mpos (atom [0 0])
         letters (atom (grid 8 8))
@@ -99,6 +70,6 @@
                          [:tr
                           (doall (map (fn [d]
                                         ^{:key d}
-                                        [:td [day d {:state (if (= d @today) :today :default)}]])
+                                        [:td [dui/day d {:state (if (= d @today) :today :default)}]])
                                       wk))])
                        days))]]]))))
