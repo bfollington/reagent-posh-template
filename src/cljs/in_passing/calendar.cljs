@@ -54,6 +54,11 @@
                       (first))]
       active)))
 
+(defn in?
+  "true if coll contains elm"
+  [coll elm]
+  (some #(= elm %) coll))
+
 (defn calendar []
   (let [mpos (atom [0 0])
         days (d/gen-month 31)
@@ -68,7 +73,8 @@
         on-selected (fn [d _] (u/log d "test") (reset! selected d))]
     (fn []
       (let [[mx my] @mpos
-            active-piece (get-active-piece @selected @events)]
+            active-piece (get-active-piece @selected @events)
+            possible-moves [6 13 14]]
         [:div
          [:button {:on-click (fn [e] (swap! today inc))} "Next Day"]
          [:div (str @selected) (str active-piece)]
@@ -91,6 +97,7 @@
                                         ^{:key d}
                                         [:td [dui/day d {:state (calc-day-state d @today)
                                                          :on-selected (partial on-selected d)
+                                                         :preview-piece (if (in? possible-moves d) active-piece nil)
                                                          :events (get @events d)}]])
                                       wk))])
                        days))]]]))))

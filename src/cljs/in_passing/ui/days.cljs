@@ -53,13 +53,14 @@
      :border (str "2px solid " (if taken "white" bg))
      :transition "border 0.2s"
      :border-radius "5px"
-     :padding "4px"}))
+     :padding "4px"
+     :opacity (if (= state :preview) "0.5" "1")}))
 
 (defn event [piece label state]
   [:div {:class (<class event-css piece state)} label])
 
 ;; state = :default :past :today :disabled
-(defn day [date {:keys [state events on-selected]}]
+(defn day [date {:keys [state events preview-piece on-selected]}]
   (let [grouped-events (group-by (fn [[_ _ s]] s) events)
         taken (:taken grouped-events)
         active (:active grouped-events)
@@ -75,6 +76,10 @@
        [v-box
         :gap "2px"
         :children (map (fn [[p txt state]] [event p txt state]) ordered-events)])
+
+     (when (some? preview-piece)
+       (let [[p txt s] preview-piece]
+         [event p txt :preview]))
 
      [:div {:class (<class day-number-css)}
       (when (= state :today)
