@@ -70,3 +70,32 @@
         days-with-offset (concat  (take first-day-offset (repeat :blank)) days)]
     days-with-offset))
 
+(defn prev-month [month]
+  (case month
+    :jan nil
+    :feb :jan
+    :mar :feb
+    :apr :mar
+    :may :apr
+    :jun :may
+    :jul :jun
+    :aug :jul
+    :sep :aug
+    :oct :sep
+    :nov :oct
+    :dec :nov))
+
+(defn next-month [month]
+  (case month
+    :jan :feb
+    :feb :mar
+    :mar :apr
+    :apr :may
+    :may :jun
+    :jun :jul
+    :jul :aug
+    :aug :sep
+    :sep :oct
+    :oct :nov
+    :nov :dec
+    :dec nil))

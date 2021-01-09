@@ -8,4 +8,10 @@
                    :events  {7 [0 1]
                              9 [2]
                              16 [3]
-                             23 [4]}}})
+                             23 [4]}}
+             :feb {:pieces  {0 [:king "Appt/ Dr. King" :active]
+                             2 [:pawn "Work" :active]
+                             3 [:pawn "Work" :active]}
+                   :events  {11 [0 1]
+                             18 [2]
+                             25 [3]}}})

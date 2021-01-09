@@ -46,23 +46,33 @@
       :else nil)))
 
 (defn calendar []
-  (let [mpos (atom [0 0])
-        month :jan
-        days (d/gen-month month)
-        weeks (d/days->weeks days)
-        level (get levels/levels month)
+  (let [month (atom :jan)
+        level (get levels/levels @month)
         pieces (atom (get level :pieces))
         events (atom (get level :events))
         selected (atom nil)
         today (atom 3)]
     (fn []
-      (let [[mx my] @mpos
+      (let [days (d/gen-month @month)
+            weeks (d/days->weeks days)
             active-piece (get-active-piece @selected @events @pieces)
             possible-moves (moves/valid-moves @selected days active-piece (get @pieces active-piece))
-            on-selected (on-grid-cell-selected active-piece selected possible-moves events pieces today)]
+            on-selected (on-grid-cell-selected active-piece selected possible-moves events pieces today)
+
+            reset-month! (fn [m]
+                           (let [level (get levels/levels m)]
+                             (reset! today 1)
+                             (reset! pieces (get level :pieces))
+                             (reset! events (get level :events))))]
         [:div
-         [:p (str month) " 2020"]
-        ;;  [:button {:on-click (fn [e] (swap! today inc))} "Next Day"]
+         [:p (str @month) " 2020"]
+         [:button {:on-click (fn [e] (reset-month! @month))} "Reset Month"]
+         [:button {:on-click (fn [e]
+                               (swap! month d/next-month)
+                               (reset-month! @month))} "Next Month"]
+         [:button {:on-click (fn [e]
+                               (swap! month d/prev-month)
+                               (reset-month! @month))} "Prev Month"]
         ;;  [:div (str @selected) (str (get @pieces active-piece))]
          [:table
           [:thead
