@@ -68,5 +68,5 @@
         first-day-offset (month->first-day-offset month)
         days (gen-days length)
         days-with-offset (concat  (take first-day-offset (repeat :blank)) days)]
-    (days->weeks days-with-offset)))
+    days-with-offset))
 

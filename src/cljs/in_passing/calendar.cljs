@@ -3,8 +3,9 @@
             [herb.core :refer [<class]]
             [re-com.core :refer [h-box v-box]]
             [in-passing.days :as d]
+            [in-passing.move :as moves]
             [in-passing.ui.days :as dui]
-            [in-passing.util :as u]
+            [in-passing.util :refer [log in?]]
             [goog.string :as gstring]
             [goog.string.format]))
 
@@ -27,34 +28,18 @@
           [d _] active]
       d)))
 
-(defn in?
-  "true if coll contains elm"
-  [coll elm]
-  (some #(= elm %) coll))
-
-(defn move-piece! [piece-id target-day from-day events]
-  (u/log ["move" piece-id "to" target-day])
-  ;; 0. ensure there is a list for this day
-  (swap! events update-in [target-day] (fnil identity []))
-  ;; 1. mark all pieces on target-day as :taken
-  ;; TODO
-  ;; 2. remove piece-id from old location
-  (swap! events update-in [from-day] (fn [old] (filter (fn [p] (not (= piece-id p))) old)))
-  ;; 3. put piece-id on target-day
-  (swap! events update-in [target-day] (fn [old] (conj old piece-id))))
-
 (defn on-grid-cell-selected [active-piece selected possible-moves events]
   (fn [d _]
     (cond
       (some? active-piece) (if (= d @selected)
                              (do
-                               (u/log d "deselect")
+                               (log d "deselect")
                                (reset! selected nil))
                              (when (in? possible-moves d)
-                               (move-piece! active-piece d @selected events)
+                               (moves/move-piece! active-piece d @selected events)
                                (reset! selected nil)))
       (nil? active-piece) (do
-                            (u/log d "selected")
+                            (log d "selected")
                             (reset! selected d))
       :else nil)))
 
@@ -62,6 +47,7 @@
   (let [mpos (atom [0 0])
         month :feb
         days (d/gen-month month)
+        weeks (d/days->weeks days)
         pieces (atom {0 [:king "Appt/ Dr. King" :active]
                       1 [:pawn "Work" :taken]
                       2 [:pawn "Work" :active]
@@ -76,12 +62,12 @@
     (fn []
       (let [[mx my] @mpos
             active-piece (get-active-piece @selected @events @pieces)
-            possible-moves [6 13 14]
+            possible-moves (moves/valid-moves @selected days active-piece (get @pieces active-piece))
             on-selected (on-grid-cell-selected active-piece selected possible-moves events)]
         [:div
          [:p (str month) " 2020"]
          [:button {:on-click (fn [e] (swap! today inc))} "Next Day"]
-         [:div (str @selected) (str (get @pieces active-piece))]
+        ;;  [:div (str @selected) (str (get @pieces active-piece))]
          [:table
           [:thead
            [:tr
@@ -103,4 +89,4 @@
                                                                  :preview-piece (if (in? possible-moves d) (get @pieces active-piece) nil)
                                                                  :events (get-pieces d @events @pieces)}]])
                                               wk))])
-                       days))]]]))))
+                       weeks))]]]))))
