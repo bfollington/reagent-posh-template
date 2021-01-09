@@ -84,6 +84,6 @@
      [:div {:class (<class day-number-css)}
       (when (= state :today)
         [:img {:class (<class day-circle-css)
-               :src "/assets/scribble.svg"}])
+               :src "assets/scribble.svg"}])
       date]]))
 

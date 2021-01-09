@@ -74,7 +74,7 @@
             current-page (:name (:data  match))
             route-params (:path-params match)]
         (reagent/after-render clerk/after-render!)
-        (session/put! :route {:current-page (page-for current-page)
+        (session/put! :route {:current-page #'home-page
                               :route-params route-params})
         (clerk/navigate-page! path)))
     :path-exists?

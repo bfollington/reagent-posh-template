@@ -47,7 +47,7 @@
           :target "resources/public/css/site.min.css"}]]
 
   :cljsbuild
-  {:builds {:min
+  {:builds {:release
             {:source-paths ["src/cljs" "src/cljc" "env/prod/cljs"]
              :compiler
              {:output-to        "target/cljsbuild/public/js/app.js"
@@ -111,7 +111,7 @@
 
              :uberjar {:hooks [minify-assets.plugin/hooks]
                        :source-paths ["env/prod/clj"]
-                       :prep-tasks ["compile" ["cljsbuild" "once" "min"]]
+                       :prep-tasks ["compile" ["cljsbuild" "once" "release"]]
                        :env {:production true}
                        :aot :all
                        :omit-source true}})
