@@ -61,7 +61,8 @@
 
 (defn calendar []
   (let [mpos (atom [0 0])
-        days (d/gen-month 31)
+        month :feb
+        days (d/gen-month month)
         events (atom {7 [[:king "Appt/ Dr. King" :active]
                          [:pawn "Work" :taken]]
                       9 [[:pawn "Work" :active]]
@@ -76,19 +77,19 @@
             active-piece (get-active-piece @selected @events)
             possible-moves [6 13 14]]
         [:div
+         [:p (str month) " 2020"]
          [:button {:on-click (fn [e] (swap! today inc))} "Next Day"]
          [:div (str @selected) (str active-piece)]
          [:table
           [:thead
-          ;;  [:tr
-          ;;   [:td "M"]
-          ;;   [:td "T"]
-          ;;   [:td "W"]
-          ;;   [:td "T"]
-          ;;   [:td "F"]
-          ;;   [:td "S"]
-            ;; [:td "S"]]
-           ]
+           [:tr
+            [:td "M"]
+            [:td "T"]
+            [:td "W"]
+            [:td "T"]
+            [:td "F"]
+            [:td "S"]
+            [:td "S"]]]
           [:tbody
            (doall (map (fn [wk]
                          ^{:key wk}
