@@ -4,6 +4,7 @@
             [re-com.core :refer [h-box v-box]]
             [in-passing.days :as d]
             [in-passing.move :as moves]
+            [in-passing.levels :as levels]
             [in-passing.ui.days :as dui]
             [in-passing.util :refer [log in?]]
             [goog.string :as gstring]
@@ -46,18 +47,12 @@
 
 (defn calendar []
   (let [mpos (atom [0 0])
-        month :feb
+        month :jan
         days (d/gen-month month)
         weeks (d/days->weeks days)
-        pieces (atom {0 [:king "Appt/ Dr. King" :active]
-                      1 [:pawn "Work" :taken]
-                      2 [:pawn "Work" :active]
-                      3 [:pawn "Work" :active]
-                      4 [:pawn "Work" :active]})
-        events (atom {7 [0 1]
-                      9 [2]
-                      16 [3]
-                      23 [4]})
+        level (get levels/levels month)
+        pieces (atom (get level :pieces))
+        events (atom (get level :events))
         selected (atom nil)
         today (atom 3)]
     (fn []
