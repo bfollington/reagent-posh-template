@@ -1,0 +1,3 @@
+echo "building..."
+lein uberjar
+
