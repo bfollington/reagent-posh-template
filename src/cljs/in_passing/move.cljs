@@ -8,11 +8,13 @@
             [goog.string :as gstring]
             [goog.string.format]))
 
-(defn move-piece! [piece-id target-day from-day events]
+(defn move-piece! [piece-id target-day from-day events pieces]
   (log ["move" piece-id "to" target-day])
   ;; 0. ensure there is a list for this day
   (swap! events update-in [target-day] (fnil identity []))
   ;; 1. mark all pieces on target-day as :taken
+  (doseq [p (get @events target-day)]
+    (swap! pieces update-in [p] (fn [[t n _]] [t n :taken])))
   ;; TODO
   ;; 2. remove piece-id from old location
   (swap! events update-in [from-day] (fn [old] (filter (fn [p] (not (= piece-id p))) old)))

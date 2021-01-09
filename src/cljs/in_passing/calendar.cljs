@@ -28,7 +28,7 @@
           [d _] active]
       d)))
 
-(defn on-grid-cell-selected [active-piece selected possible-moves events]
+(defn on-grid-cell-selected [active-piece selected possible-moves events pieces]
   (fn [d _]
     (cond
       (some? active-piece) (if (= d @selected)
@@ -36,7 +36,7 @@
                                (log d "deselect")
                                (reset! selected nil))
                              (when (in? possible-moves d)
-                               (moves/move-piece! active-piece d @selected events)
+                               (moves/move-piece! active-piece d @selected events pieces)
                                (reset! selected nil)))
       (nil? active-piece) (do
                             (log d "selected")
@@ -63,7 +63,7 @@
       (let [[mx my] @mpos
             active-piece (get-active-piece @selected @events @pieces)
             possible-moves (moves/valid-moves @selected days active-piece (get @pieces active-piece))
-            on-selected (on-grid-cell-selected active-piece selected possible-moves events)]
+            on-selected (on-grid-cell-selected active-piece selected possible-moves events pieces)]
         [:div
          [:p (str month) " 2020"]
          [:button {:on-click (fn [e] (swap! today inc))} "Next Day"]
