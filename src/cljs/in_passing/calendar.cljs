@@ -8,78 +8,80 @@
             [goog.string :as gstring]
             [goog.string.format]))
 
-(defn grid-cells [w h]
-  (mapcat (fn [r] (map (fn [c] [c r])
-                       (range w)))
-          (range h)))
-
-(def empty-cell "_")
-
-(defn grid [w h]
-  (let [gen-cols (fn [_] (into [] (map (fn [_] empty-cell) (range h))))
-        cells (into [] (map gen-cols (range w)))]
-    cells))
-
-(defn grid->cell [matrix [x y]]
-  (get (get matrix y) x))
-
-(def grid-size 8)
-(def margin 8)
-
-(defn coord [k] (+ (* grid-size k) margin))
-
-(defn map-range
-  "map between two ranges, i.e. mapping 0.5 from [0 1] to [-1 1] gives 0."
-  [x [in-min in-max] [out-min out-max]]
-  (+ (/ (* (- x in-min) (- out-max out-min)) (- in-max in-min)) out-min))
-
-(defn relative-pos [e]
-  [(- (.-clientX e) (-> e .-target .getBoundingClientRect .-left))
-   (- (.-clientY e) (-> e .-target .getBoundingClientRect .-top))])
-
-(defn text-css []
-  {:font-size "4px"})
-
 (defn calc-day-state [d today]
   (cond
     (< d today) :past
     (= d today) :today
     (> d today) :default))
 
-(defn get-active-piece [d events]
+(defn get-pieces [d events pieces]
+  (map (fn [d] (get pieces d)) (get events d)))
+
+(defn get-active-piece [d events pieces]
   (when (some? d)
     (let [day-events (get events d)
           active (->> day-events
-                      (filter (fn [[_ _ s]] (= s :active)))
-                      (first))]
-      active)))
+                      (map (fn [d] [d (get pieces d)]))
+                      (filter (fn [[_ [_ _ s]]] (= s :active)))
+                      (first))
+          [d _] active]
+      d)))
 
 (defn in?
   "true if coll contains elm"
   [coll elm]
   (some #(= elm %) coll))
 
+(defn move-piece! [piece-id target-day from-day events]
+  (u/log ["move" piece-id "to" target-day])
+  ;; 0. ensure there is a list for this day
+  (swap! events update-in [target-day] (fnil identity []))
+  ;; 1. mark all pieces on target-day as :taken
+  ;; TODO
+  ;; 2. remove piece-id from old location
+  (swap! events update-in [from-day] (fn [old] (filter (fn [p] (not (= piece-id p))) old)))
+  ;; 3. put piece-id on target-day
+  (swap! events update-in [target-day] (fn [old] (conj old piece-id))))
+
+(defn on-grid-cell-selected [active-piece selected possible-moves events]
+  (fn [d _]
+    (cond
+      (some? active-piece) (if (= d @selected)
+                             (do
+                               (u/log d "deselect")
+                               (reset! selected nil))
+                             (when (in? possible-moves d)
+                               (move-piece! active-piece d @selected events)
+                               (reset! selected nil)))
+      (nil? active-piece) (do
+                            (u/log d "selected")
+                            (reset! selected d))
+      :else nil)))
+
 (defn calendar []
   (let [mpos (atom [0 0])
         month :feb
         days (d/gen-month month)
-        events (atom {7 [[:king "Appt/ Dr. King" :active]
-                         [:pawn "Work" :taken]]
-                      9 [[:pawn "Work" :active]]
-                      16 [[:pawn "Work" :active]]
-                      23 [[:pawn "Work" :active]]})
+        pieces (atom {0 [:king "Appt/ Dr. King" :active]
+                      1 [:pawn "Work" :taken]
+                      2 [:pawn "Work" :active]
+                      3 [:pawn "Work" :active]
+                      4 [:pawn "Work" :active]})
+        events (atom {7 [0 1]
+                      9 [2]
+                      16 [3]
+                      23 [4]})
         selected (atom nil)
-        today (atom 3)
-
-        on-selected (fn [d _] (u/log d "test") (reset! selected d))]
+        today (atom 3)]
     (fn []
       (let [[mx my] @mpos
-            active-piece (get-active-piece @selected @events)
-            possible-moves [6 13 14]]
+            active-piece (get-active-piece @selected @events @pieces)
+            possible-moves [6 13 14]
+            on-selected (on-grid-cell-selected active-piece selected possible-moves events)]
         [:div
          [:p (str month) " 2020"]
          [:button {:on-click (fn [e] (swap! today inc))} "Next Day"]
-         [:div (str @selected) (str active-piece)]
+         [:div (str @selected) (str (get @pieces active-piece))]
          [:table
           [:thead
            [:tr
@@ -94,11 +96,11 @@
            (doall (map (fn [wk]
                          ^{:key wk}
                          [:tr
-                          (doall (map (fn [d]
-                                        ^{:key d}
-                                        [:td [dui/day d {:state (calc-day-state d @today)
-                                                         :on-selected (partial on-selected d)
-                                                         :preview-piece (if (in? possible-moves d) active-piece nil)
-                                                         :events (get @events d)}]])
-                                      wk))])
+                          (doall (map-indexed (fn [i d]
+                                                ^{:key (str i d)}
+                                                [:td [dui/day d {:state (calc-day-state d @today)
+                                                                 :on-selected (partial on-selected d)
+                                                                 :preview-piece (if (in? possible-moves d) (get @pieces active-piece) nil)
+                                                                 :events (get-pieces d @events @pieces)}]])
+                                              wk))])
                        days))]]]))))

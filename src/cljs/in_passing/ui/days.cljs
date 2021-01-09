@@ -1,6 +1,7 @@
 (ns in-passing.ui.days
   (:require [reagent.core :as reagent :refer [atom]]
             [clojure.test :refer [deftest is]]
+            [in-passing.util :as u]
             [herb.core :refer [<class]]
             [re-com.core :refer [h-box v-box]]
             [in-passing.color :as col]))
