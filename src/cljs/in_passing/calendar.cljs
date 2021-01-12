@@ -7,6 +7,8 @@
             [in-passing.levels :as levels]
             [in-passing.ui.days :as dui]
             [in-passing.util :refer [log in?]]
+            [in-passing.state :as db]
+            [posh.reagent :as p]
             [goog.string :as gstring]
             [goog.string.format]))
 
@@ -45,6 +47,31 @@
                             (reset! selected d))
       :else nil)))
 
+(defn select-piece! [app-id piece-id]
+  (db/add! app-id {:app/selected-piece piece-id}))
+
+(defn deselect-piece! [app-id]
+  (db/retract! app-id :app/selected-piece))
+
+(defn posh-test []
+  (let [app (db/->all [:app/id 0])
+        app-id (:db/id app)
+
+        sel-id (ffirst @(p/q db/->selected-piece db/conn))
+        selected (db/->all sel-id)
+
+        events @(p/q db/->pieces-on-day db/conn 1)
+        event-id  (ffirst @(p/q db/->event-by-name db/conn "Dummy Thicc"))]
+    (log events)
+    [:div
+     [:button {:on-click (fn [_e] (select-piece! app-id event-id))} "Set Selected"]
+     [:button {:on-click (fn [_e] (deselect-piece! app-id))} "Remove Selected"]
+     [:div (str "app " app)]
+     [:div (str "event " event-id)]
+     [:div (str "events " events)]
+     [:div (str "selected " selected)]]))
+
+
 (defn calendar []
   (let [month (atom :jan)
         level (get levels/levels @month)
@@ -65,6 +92,7 @@
                              (reset! pieces (get level :pieces))
                              (reset! events (get level :events))))]
         [:div
+         [posh-test]
          [:p (str @month) " 2020"]
          [:button {:on-click (fn [e] (reset-month! @month))} "Reset Month"]
          [:button {:on-click (fn [e]
