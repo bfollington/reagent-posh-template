@@ -47,29 +47,40 @@
                             (reset! selected d))
       :else nil)))
 
-(defn select-piece! [app-id piece-id]
-  (db/add! app-id {:app/selected-piece piece-id}))
+(defn select-day! [app-id piece-id]
+  (db/add! app-id {:game/selected-day piece-id}))
 
-(defn deselect-piece! [app-id]
-  (db/retract! app-id :app/selected-piece))
+(defn deselect-day! [app-id]
+  (db/retract! app-id :game/selected-day))
+
+(defn change-month! [app-id month]
+  (db/add! app-id {:game/month month}))
 
 (defn posh-test []
-  (let [app (db/->all [:app/id 0])
+  (let [select (partial db/select db/conn)
+        select-many (partial db/select-many db/conn)
+
+        app (db/->all [:game/id 0])
         app-id (:db/id app)
 
-        sel-id (ffirst @(p/q db/->selected-piece db/conn))
-        selected (db/->all sel-id)
+        selected-day (select db/->selected-day)
+        active-piece (db/->all (select db/->active-piece-on-day selected-day))
 
-        events @(p/q db/->pieces-on-day db/conn 1)
-        event-id  (ffirst @(p/q db/->event-by-name db/conn "Dummy Thicc"))]
-    (log events)
+        events (select-many db/->pieces-on-day 7)
+        event-id (select db/->event-by-name "Appt/ Dr. King")
+
+        month (select db/->current-month)]
+    (log db/conn)
     [:div
-     [:button {:on-click (fn [_e] (select-piece! app-id event-id))} "Set Selected"]
-     [:button {:on-click (fn [_e] (deselect-piece! app-id))} "Remove Selected"]
+     [:button {:on-click (fn [_e] (select-day! app-id 7))} "Set Selected"]
+     [:button {:on-click (fn [_e] (deselect-day! app-id))} "Remove Selected"]
+     [:button {:on-click (fn [_e] (change-month! app-id :feb))} "Change Month"]
+     [:button {:on-click (fn [_e] (moves/move-piece-2! event-id 9))} "Move Piece"]
      [:div (str "app " app)]
      [:div (str "event " event-id)]
      [:div (str "events " events)]
-     [:div (str "selected " selected)]]))
+     [:div (str "month " month)]
+     [:div (str "selected " active-piece)]]))
 
 
 (defn calendar []

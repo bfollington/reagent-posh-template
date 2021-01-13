@@ -1,28 +1,22 @@
 (ns in-passing.state
   (:require [datascript.core :as dt]
+            [in-passing.levels :as levels]
+            [in-passing.util :as u]
             [posh.reagent :as p]))
 
 (def db-schema
-  {:app/id {:db/unique :db.unique/identity}
-   :day/date {:db/unique :db.unique/identity}
-   :day/events {:db/valueType :db.type/ref
-                :db/cardinality :db.cardinality/many}})
+  {:game/id {:db/unique :db.unique/identity}
+   :game/selected-day {:db/cardinality :db.cardinality/one}})
 
-(defn seed-db [conn]
-  (dt/transact! conn [{:app/id 0
-                      ;;  :app/selected-piece nil
-                       }
-                      {:day/date 1
-                       :day/events [{:event/piece :king
-                                     :event/name "Test Event"}
-                                    {:event/piece :queen
-                                     :event/name "Another Test Event"}]}
-                      {:day/date 2
-                       :day/events [{:event/piece :pawn
-                                     :event/name "Dummy Thicc"}]}]))
+(defn load-month! [conn month]
+  (dt/transact! conn (concat [{:game/id 0
+                              ;;  :game/selected-day nil
+                               :game/month :jan
+                               :game/today 3}]
+                             (get levels/levels-2 month))))
 
 (def conn (dt/create-conn db-schema))
-(seed-db conn)
+(load-month! conn :jan)
 (p/posh! conn)
 
 (defn new-entity!
@@ -52,16 +46,28 @@
         (map (fn [[k v]] [:db/add eid k v]))
         (p/transact! conn))))
 
-(def ->selected-piece
+(def ->selected-day
   '[:find ?selected
-    :where [_ :app/selected-piece ?selected]])
+    :where [_ :game/selected-day ?selected]])
+
+(def ->selected-piece
+  '[:find ?p
+    :where
+    [_ :game/selected-day ?selected
+     ?p :event/day ?selected]])
 
 (def ->pieces-on-day
-  '[:find ?ps
+  '[:find ?d
     :in $ ?date
     :where
-    [?d :day/date ?date]
-    [?d :day/events ?ps]])
+    [?d :event/day ?date]])
+
+(def ->active-piece-on-day
+  '[:find ?d
+    :in $ ?date
+    :where
+    [?d :event/day ?date]
+    [?d :event/status :active]])
 
 (def ->event-by-name
   '[:find ?e
@@ -72,3 +78,13 @@
 (defn ->all [ent]
   @(p/pull conn '[*] ent))
 
+(def ->current-month
+  '[:find ?m
+    :where
+    [?e :game/month ?m]])
+
+(defn select [conn query & params]
+  (ffirst @(apply p/q query conn params)))
+
+(defn select-many [conn query & params]
+  (map first @(apply p/q query conn params)))

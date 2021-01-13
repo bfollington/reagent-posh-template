@@ -5,6 +5,7 @@
             [in-passing.days :as d]
             [in-passing.ui.days :as dui]
             [in-passing.util :refer [log in?]]
+            [in-passing.state :as db]
             [goog.string :as gstring]
             [goog.string.format]))
 
@@ -20,6 +21,18 @@
   (swap! events update-in [from-day] (fn [old] (filter (fn [p] (not (= piece-id p))) old)))
   ;; 3. put piece-id on target-day
   (swap! events update-in [target-day] (fn [old] (conj old piece-id))))
+
+(defn take-pieces-on-day! [day]
+  (let [pieces (db/select-many db/conn db/->pieces-on-day day)]
+    (doseq [p pieces]
+      (db/add! p {:event/status :taken}))))
+
+(defn move-event! [piece target-day]
+  (db/add! piece {:event/day target-day}))
+
+(defn move-piece-2! [piece-id target-day]
+  (take-pieces-on-day! target-day)
+  (move-event! piece-id target-day))
 
 (defn indices
   [v coll]
