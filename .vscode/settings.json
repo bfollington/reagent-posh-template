@@ -1,6 +1,17 @@
 {
   "calva.replConnectSequences": [
     {
+      "name": "app - in-passing",
+      "projectType": "Leiningen",
+      "cljsType": "lein-figwheel",
+      "menuSelections": {
+          "cljsLaunchBuilds": [
+              "app",
+          ],
+          "cljsDefaultBuild": "app"
+      }
+    },
+    {
         "name": "Devcards - in-passing",
         "projectType": "Leiningen",
         "cljsType": "lein-figwheel",
