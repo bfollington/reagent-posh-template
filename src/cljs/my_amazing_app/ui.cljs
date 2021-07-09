@@ -1,4 +1,4 @@
-(ns in-passing.ui
+(ns my-amazing-app.ui
   (:require
    [herb.core :refer [<class]]))
 

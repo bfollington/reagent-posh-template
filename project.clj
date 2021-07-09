@@ -1,4 +1,4 @@
-(defproject in-passing "0.1.0-SNAPSHOT"
+(defproject my-amazing-app "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -7,6 +7,8 @@
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [ring-server "0.5.0"]
                  [reagent "0.10.0"]
+                 [datascript "1.0.3"]
+                 [denistakeda/posh "0.5.8"]
                  [reagent-utils "0.3.3"]
                  [ring "1.8.1"]
                  [ring/ring-defaults "0.3.2"]
@@ -28,12 +30,12 @@
             [lein-asset-minifier "0.4.6"
              :exclusions [org.clojure/clojure]]]
 
-  :ring {:handler in-passing.handler/app
-         :uberwar-name "in-passing.war"}
+  :ring {:handler my-amazing-app.handler/app
+         :uberwar-name "my-amazing-app.war"}
 
   :min-lein-version "2.5.0"
-  :uberjar-name "in-passing.jar"
-  :main in-passing.server
+  :uberjar-name "my-amazing-app.jar"
+  :main my-amazing-app.server
   :clean-targets ^{:protect false}
   [:target-path
    [:cljsbuild :builds :app :compiler :output-dir]
@@ -58,9 +60,9 @@
               :pretty-print  false}}
             :app
             {:source-paths ["src/cljs" "src/cljc" "env/dev/cljs"]
-             :figwheel {:on-jsload "in-passing.core/mount-root"}
+             :figwheel {:on-jsload "my-amazing-app.core/mount-root"}
              :compiler
-             {:main "in-passing.dev"
+             {:main "my-amazing-app.dev"
               :asset-path "/js/out"
               :output-to "target/cljsbuild/public/js/app.js"
               :output-dir "target/cljsbuild/public/js/out"
@@ -72,7 +74,7 @@
             :devcards
             {:source-paths ["src/cljs" "src/cljc" "env/dev/cljs"]
              :figwheel {:devcards true}
-             :compiler {:main "in-passing.cards"
+             :compiler {:main "my-amazing-app.cards"
                         :asset-path "js/devcards_out"
                         :output-to "target/cljsbuild/public/js/app_devcards.js"
                         :output-dir "target/cljsbuild/public/js/devcards_out"
@@ -86,11 +88,11 @@
    :nrepl-port 7002
    :nrepl-middleware [cider.piggieback/wrap-cljs-repl]
    :css-dirs ["resources/public/css"]
-   :ring-handler in-passing.handler/app}
+   :ring-handler my-amazing-app.handler/app}
 
 
 
-  :profiles {:dev {:repl-options {:init-ns in-passing.repl}
+  :profiles {:dev {:repl-options {:init-ns my-amazing-app.repl}
                    :dependencies [[cider/piggieback "0.5.1"]
                                   [binaryage/devtools "1.0.2"]
                                   [ring/ring-mock "0.4.0"]
@@ -98,8 +100,6 @@
                                   [prone "2020-01-17"]
                                   [figwheel-sidecar "0.5.20"]
                                   [nrepl "0.8.0"]
-                                  [datascript "1.0.3"]
-                                  [denistakeda/posh "0.5.8"]
                                   [devcards "0.2.6" :exclusions [cljsjs/react]]
                                   [pjstadig/humane-test-output "0.10.0"]]
 

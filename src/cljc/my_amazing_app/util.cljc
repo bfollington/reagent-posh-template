@@ -1,4 +1,4 @@
-(ns in-passing.util)
+(ns my-amazing-app.util)
 
 (defn foo-cljc [x]
   "I don't do a whole lot."

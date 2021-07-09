@@ -1,4 +1,4 @@
-(ns in-passing.middleware
+(ns my-amazing-app.middleware
   (:require
    [ring.middleware.defaults :refer [site-defaults wrap-defaults]]))
 

@@ -1,4 +1,4 @@
-(ns in-passing.color)
+(ns my-amazing-app.color)
 
 (def palette
   {:maroon "#B18491"

@@ -1,7 +1,7 @@
-(ns in-passing.counter
-  (:require [in-passing.state :as db]
-            [in-passing.query :as q]
-            [in-passing.ui :as ui]
+(ns my-amazing-app.counter
+  (:require [my-amazing-app.state :as db]
+            [my-amazing-app.query :as q]
+            [my-amazing-app.ui :as ui]
             [goog.string.format]))
 
 (defn increment! [counter-id curr]

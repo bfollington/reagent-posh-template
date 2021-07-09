@@ -1,5 +1,5 @@
-(ns in-passing.repl
-  (:use in-passing.handler
+(ns my-amazing-app.repl
+  (:use my-amazing-app.handler
         figwheel-sidecar.repl-api
         ring.server.standalone
         [ring.middleware file-info file]))

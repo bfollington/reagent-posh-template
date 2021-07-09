@@ -1,4 +1,4 @@
-(ns in-passing.util
+(ns my-amazing-app.util
   (:require
    [clojure.pprint :as pp]))
 

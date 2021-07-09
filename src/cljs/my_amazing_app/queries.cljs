@@ -1,4 +1,4 @@
-(ns in-passing.query)
+(ns my-amazing-app.query)
 
 (def ->counter-value-by-name
   '[:find ?v

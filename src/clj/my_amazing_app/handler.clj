@@ -1,13 +1,13 @@
-(ns in-passing.handler
+(ns my-amazing-app.handler
   (:require
    [reitit.ring :as reitit-ring]
-   [in-passing.middleware :refer [middleware]]
+   [my-amazing-app.middleware :refer [middleware]]
    [hiccup.page :refer [include-js include-css html5]]
    [config.core :refer [env]]))
 
 (def mount-target
   [:div#app
-   [:h2 "Welcome to in-passing"]
+   [:h2 "Welcome to my-amazing-app"]
    [:p "please wait while Figwheel is waking up ..."]
    [:p "(Check the js console for hints if nothing exciting happens.)"]])
 

@@ -1,16 +1,16 @@
-(ns in-passing.cards
+(ns my-amazing-app.cards
   (:require [reagent.core :as reagent :refer [atom]]
             [reagent.dom :as rdom]
-            [in-passing.core :as core]
+            [my-amazing-app.core :as core]
             [devcards.core :as dc]
-            [in-passing.calendar :as calendar])
+            [my-amazing-app.counter :as counter])
   (:require-macros
    [devcards.core
     :as dc
     :refer [defcard defcard-doc defcard-rg deftest]]))
 
-(defcard-rg calendar
-  (calendar/calendar))
+(defcard-rg counter
+  (counter/counter))
 
 (rdom/render [:div] (.getElementById js/document "app"))
 

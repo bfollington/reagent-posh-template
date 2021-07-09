@@ -1,7 +1,7 @@
 {
   "calva.replConnectSequences": [
     {
-      "name": "app - in-passing",
+      "name": "app - my-amazing-app",
       "projectType": "Leiningen",
       "cljsType": "lein-figwheel",
       "menuSelections": {
@@ -12,7 +12,7 @@
       }
     },
     {
-        "name": "Devcards - in-passing",
+        "name": "Devcards - my-amazing-app",
         "projectType": "Leiningen",
         "cljsType": "lein-figwheel",
         "menuSelections": {

@@ -1,5 +1,5 @@
-(ns in-passino.prod
-  (:require [in-passing.core :as core]))
+(ns my-amazing-app.prod
+  (:require [my-amazing-app.core :as core]))
 
 ;;ignore println statements in prod
 (set! *print-fn* (fn [& _]))

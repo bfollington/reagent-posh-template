@@ -1,4 +1,4 @@
-(ns in-passing.core
+(ns my-amazing-app.core
   (:require
    [reagent.core :as reagent]
    [reagent.dom :as rdom]
@@ -6,9 +6,9 @@
    [reitit.frontend :as reitit]
    [clerk.core :as clerk]
    [accountant.core :as accountant]
-   [in-passing.counter :as counter]
-   [in-passing.debug :as debug]
-   [in-passing.seed-db :as seed]))
+   [my-amazing-app.counter :as counter]
+   [my-amazing-app.debug :as debug]
+   [my-amazing-app.seed-db :as seed]))
 
 ;; -------------------------
 ;; Routes

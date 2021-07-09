@@ -1,5 +1,5 @@
-(ns in-passing.seed-db
-  (:require [in-passing.state :as db]))
+(ns my-amazing-app.seed-db
+  (:require [my-amazing-app.state :as db]))
 
 (def counters ["Test", "Another Counter"])
 

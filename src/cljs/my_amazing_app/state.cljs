@@ -1,4 +1,4 @@
-(ns in-passing.state
+(ns my-amazing-app.state
   (:require [datascript.core :as dt]
             [posh.reagent :as p]))
 

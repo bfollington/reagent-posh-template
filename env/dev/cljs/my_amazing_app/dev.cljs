@@ -1,6 +1,6 @@
-(ns ^:figwheel-no-load in-passing.dev
+(ns ^:figwheel-no-load my-amazing-app.dev
   (:require
-   [in-passing.core :as core]
+   [my-amazing-app.core :as core]
    [devtools.core :as devtools]))
 
 (extend-protocol IPrintWithWriter

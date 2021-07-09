@@ -9,10 +9,7 @@ cp -r ./resources/public/css ./dist
 cp -r ./resources/public/assets ./dist
 cp ./resources/public/index.html ./dist
 
-echo "packaging..."
-zip -r dist.zip ./dist
-
-echo "uploading..."
-butler push dist.zip twopm/in-passing:web
+# echo "packaging..."
+# zip -r dist.zip ./dist
 
 echo "done!"

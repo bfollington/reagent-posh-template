@@ -1,6 +1,6 @@
-(ns in-passing.server
+(ns my-amazing-app.server
   (:require
-   [in-passing.handler :refer [app]]
+   [my-amazing-app.handler :refer [app]]
    [config.core :refer [env]]
    [ring.adapter.jetty :refer [run-jetty]])
   (:gen-class))
