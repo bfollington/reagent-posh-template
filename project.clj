@@ -6,22 +6,24 @@
 
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [ring-server "0.5.0"]
-                 [reagent "0.10.0"]
-                 [datascript "1.0.3"]
+                 [reagent "1.1.0"]
+                 [datascript "1.2.2"]
                  [denistakeda/posh "0.5.8"]
-                 [reagent-utils "0.3.3"]
+                 [reagent-utils "0.3.4"]
                  [ring "1.8.1"]
                  [ring/ring-defaults "0.3.2"]
                  [hiccup "1.0.5"]
                  [yogthos/config "1.1.7"]
-                 [re-com "2.9.0"]
+                 [re-com "2.13.2"]
                  [com.andrewmcveigh/cljs-time "0.5.2"]
                  [herb "0.10.0"]
-                 [org.clojure/clojurescript "1.10.773"
+                 [org.clojure/clojurescript "1.10.866"
                   :scope "provided"]
-                 [metosin/reitit "0.5.1"]
-                 [metosin/jsonista "0.2.6"]
+                 [metosin/reitit "0.5.13"]
+                 [metosin/jsonista "0.3.3"]
                  [pez/clerk "1.0.0"]
+                 [cljsjs/react "17.0.2-0"]
+                 [cljsjs/react-dom "17.0.2-0"]
                  [venantius/accountant "0.2.5"
                   :exclusions [org.clojure/tools.reader]]]
 
@@ -100,7 +102,7 @@
                                   [prone "2020-01-17"]
                                   [figwheel-sidecar "0.5.20"]
                                   [nrepl "0.8.0"]
-                                  [devcards "0.2.6" :exclusions [cljsjs/react]]
+                                  [devcards "0.2.7" :exclusions [cljsjs/react]]
                                   [pjstadig/humane-test-output "0.10.0"]]
 
                    :source-paths ["env/dev/clj"]
